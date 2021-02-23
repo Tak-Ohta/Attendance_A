@@ -1,0 +1,17 @@
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_with(model: @base_point, local: true) do |f| %>
+
+      <%= f.label :base_number, class: "label-#{yield(:class_text)}" %>
+      <%= f.number_field :base_number, class: "form-control" %>
+
+      <%= f.label :base_name, class: "label-#{yield(:class_text)}" %>
+      <%= f.text_field :base_name, class: "form-control" %>
+
+      <%= f.label :attendance_type, class: "label-#{yield(:class_text)}" %>
+      <%= f.select :attendance_type, [["出勤", "出勤"], ["退勤", "退勤"]], include_blank: "選択してください", class: "form-control" %>
+
+      <%= f.submit yield(:btn_text), class: "btn btn-primary btn-block btn-#{yield(:class_text)}" %>
+    <% end %>
+  </div>
+</div>
