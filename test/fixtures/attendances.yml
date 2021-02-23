@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  worked_on: 2021-02-23
+  started_at: 2021-02-23 17:10:59
+  finished_at: 2021-02-23 17:10:59
+  note: MyString
+  scheduled_end_time: 2021-02-23 17:10:59
+  next_day: false
+  instructor: MyString
+  work_contents: MyString
+  user: one
+
+two:
+  worked_on: 2021-02-23
+  started_at: 2021-02-23 17:10:59
+  finished_at: 2021-02-23 17:10:59
+  note: MyString
+  scheduled_end_time: 2021-02-23 17:10:59
+  next_day: false
+  instructor: MyString
+  work_contents: MyString
+  user: two
