@@ -32,6 +32,7 @@ gem 'bcrypt'
 gem 'bootstrap-sass'
 gem 'faker'
 gem 'jquery-rails'
+gem 'rails-i18n'
 gem 'will_paginate'
 gem 'bootstrap-will_paginate'
 

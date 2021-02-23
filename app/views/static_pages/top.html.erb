@@ -1,2 +1,7 @@
-<h1>StaticPages#top</h1>
-<p>Find me in app/views/static_pages/top.html.erb</p>
+<% provide(:title, "トップ") %>
+<div class="main-container">
+  <div class="center jumbotron">
+    <h2 class="text1">勤怠システム　ログイン</h2>
+    <%= link_to "ユーザー登録はこちらから", signup_path %>
+  </div>
+</div>
