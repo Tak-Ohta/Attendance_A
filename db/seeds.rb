@@ -7,9 +7,6 @@ User.create!(name: "Admin User",
             uid: "1",
             password: "password",
             password_confirmation: "password",
-            basic_work_time: "08:00",
-            designated_work_start_time: "09:00",
-            designated_work_end_time: "18:00",
             superior: true,
             admin: true)
 
@@ -21,9 +18,6 @@ User.create!(name: "Admin User",
   uid = n + 2
   password = "password"
   password_confirmation = "password"
-  basic_work_time = "08:00"
-  designated_work_start_time = "09:00"
-  designated_work_end_time = "18:00"
   superior = false
   admin = false
   User.create!(name: name,
@@ -33,9 +27,6 @@ User.create!(name: "Admin User",
       uid: uid,
       password: password,
       password_confirmation: password,
-      basic_work_time: basic_work_time,
-      designated_work_start_time: designated_work_start_time,
-      designated_work_end_time: designated_work_end_time,
       superior: superior,
       admin: admin)
 end

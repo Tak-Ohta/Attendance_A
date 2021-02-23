@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210223052807) do
+ActiveRecord::Schema.define(version: 20210223074126) do
 
   create_table "users", force: :cascade do |t|
     t.string "name"
@@ -19,9 +19,9 @@ ActiveRecord::Schema.define(version: 20210223052807) do
     t.integer "employee_number"
     t.string "uid"
     t.string "password_digest"
-    t.datetime "basic_work_time"
-    t.datetime "designated_work_start_time"
-    t.datetime "designated_work_end_time"
+    t.datetime "basic_work_time", default: "2021-02-22 23:00:00"
+    t.datetime "designated_work_start_time", default: "2021-02-23 00:00:00"
+    t.datetime "designated_work_end_time", default: "2021-02-23 09:00:00"
     t.boolean "superior"
     t.boolean "admin"
     t.datetime "created_at", null: false
