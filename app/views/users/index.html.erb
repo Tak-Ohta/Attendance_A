@@ -1,0 +1,52 @@
+<% provide(:title, "ユーザー一覧") %>
+<% provide(:class_text, "user--edit") %>
+<% provide(:btn_text, "更新") %>
+<h2>ユーザー一覧</h2>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= form_with(url: import_users_path) do |f| %>
+      <%= f.file_field :file, accept: '.csv' %>
+      <%= f.submit "csvをインポート", class: "btn btn-primary csv-button" %>
+    <% end %>
+    
+    <%= will_paginate %>
+    <table class="table table-condensed" id="table-users">
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.name %></td>
+        </tr>
+        <tr>
+          <td>
+            <% if !current_user?(user) %>
+              <%= link_to "削除", user, method: :delete,
+                  data: { confirm: "#{user.name}のデータを削除してよろしいですか？"},
+                  class: "btn btn-primary" %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <div class="panel-group" id="accordion">
+            <td>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <button data-toggle="collapse" data-toggle="collapse" data-target="#collapse<%= user.id %>" class="btn btn-primary btn-lg">
+                      編集
+                    </button>
+                  </h4>
+                </div>
+                <div id="collapse<%= user.id %>" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <%= render 'form', locals: {user: @user = User.find_by(id: user.id) } %>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </div>
+        </tr>
+      <% end %>
+    </table>
+    <%= will_paginate %>
+  </div>
+</div>
