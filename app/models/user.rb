@@ -46,12 +46,11 @@ class User < ApplicationRecord
     CSV.foreach(file.path, headers: true, skip_blanks: true) do |row|
       user = find_by(id: row["id"]) || new
       user.attributes = row.to_hash.slice(*updatable_attributes)
-      user.save!
+      user.save!(validate: false)
     end
   end
 
   def self.updatable_attributes
-    ['id', 'name', 'email', 'affiliation', 'employee_number', 'uid', 'password', 'basic_work_time',
-      'designated_work_start_time', 'designated_work_end_time', 'superior', 'admin']
+    ['id', 'name', 'email', 'affiliation', 'employee_number', 'uid', 'password', 'superior', 'admin']
   end
 end

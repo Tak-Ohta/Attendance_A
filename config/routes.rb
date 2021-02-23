@@ -1,9 +1,5 @@
 Rails.application.routes.draw do
 
-  get 'base_points/new'
-
-  get 'sessions/new'
-
   root 'sessions#new'
   get '/signup', to: 'users#new'
 

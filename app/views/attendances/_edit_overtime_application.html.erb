@@ -1,0 +1,50 @@
+<% provide(:title, "残業申請") %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h2 class="modal-title">残業申請</h2>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <%= form_with(model: @user, url: attendances_update_overtime_application_user_path(@user, date: params[:date]), method: :patch, local: true) do |f| %>
+            <%= render 'shared/error_messages', object: @user %>
+            <table class="table table-bordered table-condensed" id="table-overtime-application">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>曜日</th>
+                  <th>終了予定時間</th>
+                  <th>翌日</th>
+                  <th>業務処理内容</th>
+                  <th>指示者確認 &#12958;</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @attendances.each do |day| %>
+                  <%= f.fields_for "attendances[]", day do |attendance| %>
+                    <% if day.worked_on == @attendance.worked_on %>
+                      <tr>
+                        <td><%= l(day.worked_on, format: :short) %></td>
+                        <td><%= $days_of_the_week[day.worked_on.wday] %></td>
+                        <td><%= attendance.time_field :scheduled_end_time, class: "form-control" %></td>
+                        <td><%= attendance.check_box :next_day, {}, true, false %></td>
+                        <td><%= attendance.text_field :work_contents, class: "form-control" %></td>
+                        <td><%= attendance.collection_select :instructor, User.all.where(superior: true).order(:user_id), :superior, :name, {prompt: ""}, class: "form-control" %></td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </tbody>
+            </table>
+            <%= f.submit "変更を送信する", class: "btn btn-primary btn-block" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
