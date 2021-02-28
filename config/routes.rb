@@ -9,6 +9,8 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
+      get 'edit_basic_info'
+      patch 'update_basic_info'
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month'
       get 'attendances/edit_overtime_application'

@@ -96,11 +96,18 @@
           <% end %>
         </td>
         <td><%= day.note %></td>
-        <td><%= day.scheduled_end_time.hour if day.scheduled_end_time.present? %></td>
-        <td><%= day.scheduled_end_time.min if day.scheduled_end_time.present? %></td>
+        <td><%= day.scheduled_end_time.floor_to(15.minutes).hour if day.scheduled_end_time.present? %></td>
+        <td><%= day.scheduled_end_time.floor_to(15.minutes).min if day.scheduled_end_time.present? %></td>
         <td>
-          <!-- 残業時間を表示 -->
-          <!-- 「翌日」チェックがtrueならば、.tomorowでovertimeヘルパーメソッドに渡す --> 
+          <% if day.scheduled_end_time.present? %>
+            <% designated_work_end_time = date_correction(day.worked_on, @user.designated_work_end_time) %>
+            <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
+            <% if day.next_day == true %>
+              <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
+            <% else %>
+              <%= overtime(designated_work_end_time, scheduled_end_time) %>
+            <% end %>
+          <% end %>
         </td>
         <td><%= day.work_contents if day.work_contents.present? %></td>
         <td><%= day.instructor if day.instructor.present? %></td>
