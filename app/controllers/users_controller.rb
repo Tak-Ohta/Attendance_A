@@ -12,6 +12,9 @@ class UsersController < ApplicationController
   def show
     # 出勤日数
     @worked_sum = @attendances.where.not(started_at: nil).count
+    if current_user.superior?
+      @overtime_application = Attendance.all.where(instructor: current_user.name).count
+    end
   end
 
   def create

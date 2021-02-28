@@ -67,6 +67,12 @@ class AttendancesController < ApplicationController
     end
   end
 
+  def edit_overtime_approval
+  end
+
+  def update_overtime_approval
+  end
+
   private
     def attendances_params
       params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day, :note, :instructor])[:attendances]
