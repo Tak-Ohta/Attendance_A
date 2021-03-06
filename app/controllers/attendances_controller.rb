@@ -70,7 +70,7 @@ class AttendancesController < ApplicationController
 
   def edit_overtime_approval
     # 【ここから】 申請者の情報と申請者の残業申請データを取得する！
-    @overtime = Attendance.includes(:user).where(superior: current_user.name)
+    @overtime = Attendance.includes(:user).where(instructor: current_user.name)
   end
 
   def update_overtime_approval

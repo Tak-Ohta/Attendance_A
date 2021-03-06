@@ -184,6 +184,22 @@ p {
   }
 }
 
+#table-overtime-approval {
+  margin: 5px;
+  h2 {
+    margin-top: 30px;
+  }
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+  }
+  td {
+    vertical-align: middle;
+    text-align: center;
+  }
+}
+
 #table-base-point {
   margin-top: 15px;
   th {

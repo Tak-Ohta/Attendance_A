@@ -12,12 +12,48 @@
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="md-col-10 md-col-offset-1">
-          <table class="table table-bordered table-condensed table-hover">
-            <tr>
-              <td>ここに表示</td>
-            </tr>
-          </table>
+        <div class="md-col-12">
+          <% @overtime.each do |overtime| %>
+            <h2 class="applicant">【<%= overtime.user.name %> からの残業申請】</h2>
+            <table class="table table-bordered table-condensed table-hover", id="table-overtime-approval">
+              <thead>
+                <tr>
+                  <th class="label-#{yield(:class_text)}">日付</th>
+                  <th class="label-#{yield(:class_text)}">曜日</th>
+                  <th class="label-#{yield(:class_text)}">終了予定時間</th>
+                  <th class="label-#{yield(:class_text)}">指定勤務終了時間</th>
+                  <th class="label-#{yield(:class_text)}">時間外時間</th>
+                  <th class="label-#{yield(:class_text)}">業務処理内容</th>
+                  <th class="label-#{yield(:class_text)}">指示者確認 &#12958;</th>
+                  <th class="label-#{yield(:class_text)}">変更</th>
+                  <th class="label-#{yield(:class_text)}">勤怠を確認する</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><%= l(overtime.worked_on, format: :short) %></td>
+                  <td><%= $days_of_the_week[overtime.worked_on.wday] %></td>
+                  <td><%= overtime.scheduled_end_time %></td>
+                  <td><%= overtime.user.designated_work_end_time %></td>
+                  <td>
+                    <% if overtime.scheduled_end_time.present? %>
+                      <% designated_work_end_time = date_correction(overtime.worked_on, overtime.user.designated_work_end_time) %>
+                      <% scheduled_end_time = date_correction(overtime.worked_on, overtime.scheduled_end_time.floor_to(15.minutes)) %>
+                      <% if overtime.next_day == true %>
+                        <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
+                      <% else %>
+                        <%= overtime(designated_work_end_time, scheduled_end_time) %>
+                      <% end %>
+                    <% end %>
+                  </td>
+                  <td><%= overtime.work_contents %></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          <% end %>
         </div>
       </div>
     </div>
