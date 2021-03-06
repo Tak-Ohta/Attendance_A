@@ -29,7 +29,7 @@
 
 
     <div>
-      <% if current_user.admin? %>
+      <% if current_user.superior? %>
         <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %><br>
         <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
         <% if @overtime_application >= 1 %>

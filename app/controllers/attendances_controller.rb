@@ -3,6 +3,7 @@ class AttendancesController < ApplicationController
   before_action :set_user, only: [:edit_one_month, :update_one_month, :edit_overtime_application, :update_overtime_application]
   before_action :logged_in_user, only: [:update, :edit_one_month, :update_one_month]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month, :edit_overtime_application, :update_overtime_application]
+  before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval]
   before_action :set_one_month, only: [:edit_one_month, :edit_overtime_application]
   before_action :superiors, only: [:edit_one_month, :edit_overtime_application]
   before_action :overtime_application, only: [:edit_overtime_application, :update_overtime_application]
@@ -68,6 +69,8 @@ class AttendancesController < ApplicationController
   end
 
   def edit_overtime_approval
+    # 【ここから】 申請者の情報と申請者の残業申請データを取得する！
+    @overtime = Attendance.includes(:user).where(superior: current_user.name)
   end
 
   def update_overtime_approval

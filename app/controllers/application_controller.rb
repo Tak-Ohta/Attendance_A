@@ -24,6 +24,10 @@ class ApplicationController < ActionController::Base
     redirect_to root_url unless current_user.admin?
   end
 
+  def superior_user
+    redirect_to root_url unless current_user.superior?
+  end
+
   def set_one_month
     @first_day = params[:date].nil? ?
     Date.current.beginning_of_month : params[:date].to_date
