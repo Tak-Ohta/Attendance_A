@@ -57,7 +57,7 @@ class AttendancesController < ApplicationController
   end
 
   def update_overtime_application
-    overtime_params.each do |id, item|
+    overtime_application_params.each do |id, item|
       attendance = Attendance.find(id)
       if attendance.update(item)
         flash[:success] = "残業申請が完了しました。"
@@ -69,11 +69,19 @@ class AttendancesController < ApplicationController
   end
 
   def edit_overtime_approval
-    # 【ここから】 申請者の情報と申請者の残業申請データを取得する！
-    @attendance = Attendance.includes(:user).where(instructor: current_user.name)
+    @users = User.includes(:attendances).where(attendances: { instructor: current_user.name })
   end
 
   def update_overtime_approval
+    overtime_approval_params.each do |id, item|
+      attendance = Attendance.find(id)
+      if attendance.update(item)
+        flash[:success] = "残業申請の変更を送信しました。"
+      else
+        flash[:danger] = "残業申請の送信に失敗しました。"
+      end
+    end
+    redirect_to user_url(current_user)
   end
 
   private
@@ -81,8 +89,12 @@ class AttendancesController < ApplicationController
       params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day, :note, :instructor])[:attendances]
     end
 
-    def overtime_params
+    def overtime_application_params
       params.require(:user).permit(attendances: [:scheduled_end_time, :next_day, :work_contents, :instructor])[:attendances]
+    end
+
+    def overtime_approval_params
+      params.require(:user).permit(attendances: [:instructor, :approval_check_box])[:attendances]
     end
 
     def admin_or_correct_user

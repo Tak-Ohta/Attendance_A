@@ -13,9 +13,9 @@
     <div class="modal-body">
       <div class="row">
         <div class="md-col-10 md-col-offset-1">
-          <%= form_with(model: @attendance, url: attendances_update_overtime_approval_user_path, method: :patch, local: true) do |f| %>
-            <% @attendance.each do |attendance| %>
-              <h2 class="applicant">【<%= attendance.user.name %> からの残業申請】</h2>
+          <%= form_with(model: @users, url: attendances_update_overtime_approval_user_path(@users), method: :patch, local: true) do |f| %>
+            <% @users.each do |user| %>
+              <h2 class="applicant">【<%= user.name %> からの残業申請】</h2>
               <table class="table table-bordered table-condensed table-hover", id="table-overtime-approval">
                 <thead>
                   <tr>
@@ -31,27 +31,31 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><%= l(attendance.worked_on, format: :short) %></td>
-                    <td><%= $days_of_the_week[attendance.worked_on.wday] %></td>
-                    <td><%= l(attendance.scheduled_end_time, format: :time) %></td>
-                    <td><%= l(attendance.user.designated_work_end_time, format: :time) %></td>
-                    <td>
-                      <% if attendance.scheduled_end_time.present? %>
-                        <% designated_work_end_time = date_correction(attendance.worked_on, attendance.user.designated_work_end_time) %>
-                        <% scheduled_end_time = date_correction(attendance.worked_on, attendance.scheduled_end_time.floor_to(15.minutes)) %>
-                        <% if attendance.next_day == true %>
-                          <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
-                        <% else %>
-                          <%= overtime(designated_work_end_time, scheduled_end_time) %>
-                        <% end %>
-                      <% end %>
-                    </td>
-                    <td><%= attendance.work_contents %></td>
-                    <td><%= f.select :instructor, [["申請中", "申請中"], ["なし", "なし"], ["承認", "承認"], ["否認", "否認"]] %></td>
-                    <td><%= f.check_box :approval_check_box, {}, true, false %></td>
-                    <td><%= link_to "確認", user_path(attendance.user, date: attendance.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
-                  </tr>
+                  <% user.attendances.each do |day| %>
+                    <%= f.fields_for "attendances[]", day do |attendance| %>
+                      <tr>
+                        <td><%= l(day.worked_on, format: :short) %></td>
+                        <td><%= $days_of_the_week[day.worked_on.wday] %></td>
+                        <td><%= l(day.scheduled_end_time, format: :time) %></td>
+                        <td><%= l(user.designated_work_end_time, format: :time) %></td>
+                        <td>
+                          <% if day.scheduled_end_time.present? %>
+                            <% designated_work_end_time = date_correction(day.worked_on, user.designated_work_end_time) %>
+                            <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
+                            <% if day.next_day == true %>
+                              <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
+                            <% else %>
+                              <%= overtime(designated_work_end_time, scheduled_end_time) %>
+                            <% end %>
+                          <% end %>
+                        </td>
+                        <td><%= day.work_contents %></td>
+                        <td><%= attendance.select :instructor, [["申請中", "申請中"], ["なし", "なし"], ["承認", "承認"], ["否認", "否認"]] %></td>
+                        <td><%= attendance.check_box :approval_check_box, {}, true, false %></td>
+                        <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
+                      </tr>
+                    <% end %>
+                  <% end %>
                 </tbody>
               </table>
             <% end %>
