@@ -75,10 +75,14 @@ class AttendancesController < ApplicationController
   def update_overtime_approval
     overtime_approval_params.each do |id, item|
       attendance = Attendance.find(id)
-      if attendance.update(item)
-        flash[:success] = "残業申請の変更を送信しました。"
+      if attendance.approval_check_box != "true"
+        flash[:danger] = "「変更」欄にチェックがありません。"
       else
-        flash[:danger] = "残業申請の送信に失敗しました。"
+        if attendance.update(item)
+          flash[:success] = "残業申請の変更を送信しました。"
+        else
+          flash[:danger] = "残業申請の送信に失敗しました。"
+        end
       end
     end
     redirect_to user_url(current_user)
