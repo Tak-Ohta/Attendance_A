@@ -36,7 +36,7 @@
                         <td><%= attendance.time_field :scheduled_end_time, class: "form-control" %></td>
                         <td><%= attendance.check_box :next_day, {}, true, false %></td>
                         <td><%= attendance.text_field :work_contents, class: "form-control" %></td>
-                        <td><%= attendance.collection_select :instructor, User.all.where(superior: true)  , :name, :name, {prompt: ""}, class: "form-control" %></td>
+                        <td><%= attendance.collection_select :instructor, @superiors, :name, :name, {prompt: ""}, class: "form-control" %></td>
                       </tr>
                     <% end %>
                   <% end %>

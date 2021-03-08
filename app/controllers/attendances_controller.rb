@@ -54,6 +54,7 @@ class AttendancesController < ApplicationController
 
   def edit_overtime_application
     @attendance = @user.attendances.find_by(worked_on: params[:date])
+    @superiors = User.where(superior: true).where.not(name: @user.name)
   end
 
   def update_overtime_application
