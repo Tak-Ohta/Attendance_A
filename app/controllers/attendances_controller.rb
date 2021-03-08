@@ -76,14 +76,15 @@ class AttendancesController < ApplicationController
   def update_overtime_approval
     overtime_approval_params.each do |id, item|
       attendance = Attendance.find(id)
-      if attendance.approval_check_box != "true"
-        flash[:danger] = "「変更」欄にチェックがありません。"
-      else
+      user = User.find(attendance.user_id)
+      if overtime_approval_params[id][:approval_check_box] == "true"
         if attendance.update(item)
-          flash[:success] = "残業申請の変更を送信しました。"
+          flash[:success] = "#{user.name}の残業申請の変更を送信しました。"
         else
-          flash[:danger] = "残業申請の送信に失敗しました。"
+          flash[:danger] = "#{user.name}の残業申請の送信に失敗しました。"
         end
+      else
+        flash[:danger] = "「変更」欄にチェックがありません。#{user.name}の変更を反映できませんでした。"
       end
     end
     redirect_to user_url(current_user)
@@ -99,7 +100,7 @@ class AttendancesController < ApplicationController
     end
 
     def overtime_approval_params
-      params.require(:user).permit(attendances: [:instructor, :approval_check_box])[:attendances]
+      params.require(:user).permit(attendances: [:user_id, :instructor, :approval_check_box])[:attendances]
     end
 
     def admin_or_correct_user
