@@ -4,6 +4,7 @@ class UsersController < ApplicationController
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: [:index, :destroy]
   before_action :set_one_month, only: :show
+  before_action :superiors, only: :show
 
   def new
     @user = User.new
@@ -12,9 +13,14 @@ class UsersController < ApplicationController
   def show
     # 出勤日数
     @worked_sum = @attendances.where.not(started_at: nil).count
-    # ↓↓↓↓↓↓ワイルドカードを使って、上長が回答済みのものは含まないようにしたい。
+    # 上長ごとに、残業申請がされている件数をカウント
     if current_user.superior?
       @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
+    end
+
+    # 上長ごとに、1ヶ月分の勤怠申請がされている件数をカウント
+    if current_user.superior?
+      @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name).count
     end
   end
 

@@ -52,6 +52,7 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_one_month_user_url(date: params[:date])
   end
 
+  # 残業申請
   def edit_overtime_application
     @attendance = @user.attendances.find_by(worked_on: params[:date])
   end
@@ -69,6 +70,7 @@ class AttendancesController < ApplicationController
     end
   end
 
+  # 残業承認
   def edit_overtime_approval
     @users = User.includes(:attendances).where(attendances: { select_superior_for_overtime: current_user.name })
   end
@@ -100,6 +102,31 @@ class AttendancesController < ApplicationController
       redirect_to user_url(current_user)
   end
 
+  # 1ヶ月の勤怠申請
+  def edit_monthly_attendance_application
+  end
+
+  def update_monthly_attendance_application
+    @user = User.find(params[:id])
+    
+    monthly_attendance_application_params.each do |id, item|
+      attendance = Attendance.find(id)
+      if attendance.update(item)
+        flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ申請しました。"
+      else
+        flash[:danger] = "申請に失敗しました。"
+      end
+      redirect_to @user
+    end
+  end
+
+  # 1ヶ月の勤怠承認
+  def edit_monthly_attendance_approval
+  end
+
+  def update_monthly_attendance_approval
+  end
+
   private
     def attendances_params
       params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day, :note, :instructor])[:attendances]
@@ -113,16 +140,16 @@ class AttendancesController < ApplicationController
       params.require(:user).permit(attendances: [:user_id, :confirm_superior_for_overtime, :approval_check_box])[:attendances]
     end
 
+    def monthly_attendance_application_params
+      params.require(:user).permit(attendance: :select_superior_for_monthly_attendance)[:attendance]
+    end
+
     def admin_or_correct_user
       @user = User.find(params[:user_id]) if @user.blank?
       unless current_user?(@user) || current_user.admin?
         flash[:danger] = "参照・編集権限がありません。"
         redirect_to root_url
       end
-    end
-  
-    def superiors
-      @superiors = User.where(superior: true).where.not(name: @user.name)
     end
 
     def overtime_application

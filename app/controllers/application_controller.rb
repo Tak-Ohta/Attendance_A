@@ -28,6 +28,10 @@ class ApplicationController < ActionController::Base
     redirect_to root_url unless current_user.superior?
   end
 
+  def superiors
+    @superiors = User.where(superior: true).where.not(name: @user.name)
+  end
+
   def set_one_month
     @first_day = params[:date].nil? ?
     Date.current.beginning_of_month : params[:date].to_date
