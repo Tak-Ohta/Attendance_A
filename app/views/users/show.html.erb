@@ -29,7 +29,7 @@
 
 
     <div>
-      <% if current_user.superior? %>
+      <% if current_user.superior? && current_user?(@user) %>
         <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %><br>
         <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
         <% if @overtime_application >= 1 %>
@@ -79,23 +79,31 @@
     <tbody>
       <% @attendances.each do |day| %>
       <tr>
-        <td><%= link_to "残業申請", attendances_edit_overtime_application_user_path(@user, date: day.worked_on), remote: true, class: "btn btn-primary btn-sm" %></td>
+        <!-- 産業申請ボタン -->
+        <td>
+          <%= link_to "残業申請", attendances_edit_overtime_application_user_path(@user, date: day.worked_on), remote: true, class: "btn btn-primary btn-sm" %>
+        </td>
         <td><%= l(day.worked_on, format: :short) %></td>
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
+        <!-- 出社時間 -->
         <td><%= day.started_at.floor_to(15.minutes).hour if day.started_at.present? %></td>
         <td><%= day.started_at.floor_to(15.minutes).min if day.started_at.present? %></td>
+        <!-- 出勤ボタン -->
         <td>
           <% if (Date.current == day.worked_on) && day.started_at.nil? %>
             <%= link_to "出勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
           <% end %>
         </td>
+        <!-- 退社時間 -->
         <td><%= day.finished_at.floor_to(15.minutes).hour if day.finished_at.present? %></td>
         <td><%= day.finished_at.floor_to(15.minutes).min if day.finished_at.present? %></td>
+        <!-- 退勤ボタン -->
         <td>
           <% if (Date.current == day.worked_on) && day.started_at.present? && day.finished_at.nil? %>
             <%= link_to "退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
           <% end %>
         </td>
+        <!-- 在社時間 -->
         <td>
           <% if day.started_at.present? && day.finished_at.present? %>
             <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
@@ -103,10 +111,20 @@
           <% end %>
         </td>
         <td><%= day.note %></td>
-        <td><%= day.scheduled_end_time.floor_to(15.minutes).hour if day.scheduled_end_time.present? %></td>
-        <td><%= day.scheduled_end_time.floor_to(15.minutes).min if day.scheduled_end_time.present? %></td>
+        <!-- 終了予定時間 -->
         <td>
-          <% if day.scheduled_end_time.present? %>
+          <% if day.confirm_superior_for_overtime == "承認" %>
+            <%= day.scheduled_end_time.floor_to(15.minutes).hour if day.scheduled_end_time.present? %>
+          <% end %>
+        </td>
+        <td>
+          <% if day.confirm_superior_for_overtime == "承認" %>
+            <%= day.scheduled_end_time.floor_to(15.minutes).min if day.scheduled_end_time.present? %>
+          <% end %> 
+        </td>
+        <!-- 時間外時間 -->
+        <td>
+          <% if day.scheduled_end_time.present? && day.confirm_superior_for_overtime == "承認" %>
             <% designated_work_end_time = date_correction(day.worked_on, @user.designated_work_end_time) %>
             <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
             <% if day.next_day == true %>
@@ -116,7 +134,9 @@
             <% end %>
           <% end %>
         </td>
-        <td><%= day.work_contents if day.work_contents.present? %></td>
+        <!-- 業務処理内容 -->
+        <td><%= day.work_contents if day.work_contents.present? && day.confirm_superior_for_overtime == "承認" %></td>
+        <!-- 指示者確認印 ←←←これをカラムに保存する -->
         <td><%= day.instructor if day.instructor.present? %></td>
       </tr>
       <% end %>
@@ -128,9 +148,10 @@
         <td colspan="6"></td>
         <td><%= format("%.2f", @total_working_time.to_f) %></td>
         <td colspan="5"></td>
+        <!--> 1ヶ月分の勤怠を申請する <-->
         <td>
-         <p>所属長承認</p>
-         <p>ここに所属長選択DD作成</p>
+          所属長承認
+          
          <%= link_to "申請", '#', class: "btn btn-primary btn-sm" %>
         </td>
       </tr>

@@ -37,7 +37,7 @@
                 <% end %>
               </td>
               <td><%= attendance.text_field :note, class: "form-control" %></td>
-              <td><%= f.collection_select :superior, User.all.where(superior: true), :superior, :name, include_blank: "選択してください", selected: "", class: "form-control" %></td>
+              <td><%= attendance.text_field :instructor, class: "form-control" %></td>
             </tr>
           <% end %>    
         <% end %>

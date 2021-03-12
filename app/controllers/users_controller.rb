@@ -12,8 +12,9 @@ class UsersController < ApplicationController
   def show
     # 出勤日数
     @worked_sum = @attendances.where.not(started_at: nil).count
+    # ↓↓↓↓↓↓ワイルドカードを使って、上長が回答済みのものは含まないようにしたい。
     if current_user.superior?
-      @overtime_application = Attendance.where(instructor: current_user.name).count
+      @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
     end
   end
 

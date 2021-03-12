@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210306085616) do
+ActiveRecord::Schema.define(version: 20210312043803) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -25,6 +25,10 @@ ActiveRecord::Schema.define(version: 20210306085616) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "approval_check_box", default: false
+    t.string "select_superior_for_overtime"
+    t.string "confirm_superior_for_overtime"
+    t.string "select_superior_for_monthly_attendance"
+    t.string "confirm_superior_for_monthly_attendance"
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 

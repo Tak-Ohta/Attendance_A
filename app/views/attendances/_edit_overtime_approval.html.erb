@@ -50,7 +50,7 @@
                           <% end %>
                         </td>
                         <td><%= day.work_contents %></td>
-                        <td><%= attendance.select :instructor, [["申請中", "申請中"], ["なし", "なし"], ["承認", "承認"], ["否認", "否認"]] %></td>
+                        <td><%= attendance.select :confirm_superior_for_overtime, [["申請中", "申請中"], ["なし", "なし"], ["承認", "承認"], ["否認", "否認"]] %></td>
                         <td><%= attendance.check_box :approval_check_box, {}, true, false %></td>
                         <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
                       </tr>
