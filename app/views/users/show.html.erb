@@ -4,11 +4,15 @@
     <tr>
       <td>
         <div class="btn-users-show">
-          <p>
-            <%= link_to "⬅️", user_path(date: @first_day.prev_month), class: "btn btn-primary btn-users-month" %>
-            【 <%= l(@first_day, format: :middle) %> 時間管理表 】
-            <%= link_to "➡️", user_path(date: @first_day.next_month), class: "btn btn-primary btn-users-month" %>
-          </p>
+          <% if current_user?(@user) || current_user.admin? %>
+            <p>
+              <%= link_to "⬅️", user_path(date: @first_day.prev_month), class: "btn btn-primary btn-users-month" %>
+              【 <%= l(@first_day, format: :middle) %> 時間管理表 】
+              <%= link_to "➡️", user_path(date: @first_day.next_month), class: "btn btn-primary btn-users-month" %>
+            </p>
+          <% else %>
+              <p>【 <%= l(@first_day, format: :middle) %> 時間管理表 】</p>
+          <% end %>
         </div>
       </td>
       <td>
@@ -27,32 +31,34 @@
     </tr>
   </table>
 
-    <!-- 上長へのお知らせ -->
-    <div>
-      <% if current_user.superior? && current_user?(@user) %>
-        <!-- 1ヶ月の勤怠申請 -->
-        <% if @monthly_attendance_application >= 1 %>
-          <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %>
-          <span  style="border: solid 2px red; color: red;"><%= @monthly_attendance_application %>件の通知があります。</span><br>
-        <% else %>
-          <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %>
-        <% end %>
-        <!-- 勤怠変更申請 -->
-        <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
-        <!-- 残業申請 -->
-        <% if @overtime_application >= 1 %>
-          <%= link_to "【残業申請のお知らせ】", attendances_edit_overtime_approval_user_path, remote: true, class: "btn-notice overtime-notice" %>
-          <span style="border: solid 2px red; color: red;"><%= @overtime_application %>件の通知があります。</span><br>
-        <% else %>
-          <%= link_to "【残業申請のお知らせ】" , '#', class: "btn-notice" %><br>
-        <% end %>
+  <!-- 上長へのお知らせ -->
+  <div>
+    <% if current_user.superior? && current_user?(@user) %>
+      <!-- 1ヶ月の勤怠申請 -->
+      <% if @monthly_attendance_application >= 1 %>
+        <%= link_to "【所属長承認申請のお知らせ】", attendances_edit_monthly_attendance_approval_user_path, remote: true, class: "btn-notice application-notice" %>
+        <span  style="border: solid 2px red; color: red;"><%= @monthly_attendance_application %>件の通知があります。</span><br>
+      <% else %>
+        <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %><br>
       <% end %>
-    </div>
-    <div class="btn-user-attendance">
+      <!-- 勤怠変更申請 -->
+      <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
+      <!-- 残業申請 -->
+      <% if @overtime_application >= 1 %>
+        <%= link_to "【残業申請のお知らせ】", attendances_edit_overtime_approval_user_path, remote: true, class: "btn-notice application-notice" %>
+        <span style="border: solid 2px red; color: red;"><%= @overtime_application %>件の通知があります。</span><br>
+      <% else %>
+        <%= link_to "【残業申請のお知らせ】" , '#', class: "btn-notice" %><br>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="btn-user-attendance">
+    <% if current_user?(@user) || current_user.admin? %>
       <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
       <%= link_to "CSV出力", '#', class: "btn btn-primary" %>
       <%= link_to "勤怠修正ログ（承認済み）", '#', class: "btn btn-primary" %>
-    </div>
+    <% end %>
+  </div>  
 
   <table class="table table-bordered table-condensed" id="table-attendances">
     <thead>
@@ -89,7 +95,9 @@
       <tr>
         <!-- 産業申請ボタン -->
         <td>
-          <%= link_to "残業申請", attendances_edit_overtime_application_user_path(@user, date: day.worked_on), remote: true, class: "btn btn-primary btn-sm" %>
+          <% if current_user?(@user) || current_user.admin? %>
+            <%= link_to "残業申請", attendances_edit_overtime_application_user_path(@user, date: day.worked_on), remote: true, class: "btn btn-primary btn-sm" %>
+          <% end %>
         </td>
         <td><%= l(day.worked_on, format: :short) %></td>
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
@@ -98,8 +106,10 @@
         <td><%= day.started_at.floor_to(15.minutes).min if day.started_at.present? %></td>
         <!-- 出勤ボタン -->
         <td>
-          <% if (Date.current == day.worked_on) && day.started_at.nil? %>
-            <%= link_to "出勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
+          <% if current_user?(@user) || current_user.admin? %>
+            <% if (Date.current == day.worked_on) && day.started_at.nil? %>
+              <%= link_to "出勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
+            <% end %>
           <% end %>
         </td>
         <!-- 退社時間 -->
@@ -107,8 +117,10 @@
         <td><%= day.finished_at.floor_to(15.minutes).min if day.finished_at.present? %></td>
         <!-- 退勤ボタン -->
         <td>
-          <% if (Date.current == day.worked_on) && day.started_at.present? && day.finished_at.nil? %>
-            <%= link_to "退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
+          <% if current_user?(@user) || current_user.admin? %>
+            <% if (Date.current == day.worked_on) && day.started_at.present? && day.finished_at.nil? %>
+              <%= link_to "退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
+            <% end %>
           <% end %>
         </td>
         <!-- 在社時間 -->
@@ -158,20 +170,35 @@
         <td colspan="5"></td>
         <!-- 1ヶ月分の勤怠を申請する -->
         <td>
-          <%= form_with(model: @user, url: attendances_update_monthly_attendance_application_user_path(@user), method: :patch, local: true) do |f| %>
-            <% day = @attendances.find_by(worked_on: @last_day) %>
-            <%= f.fields_for "attendance[]", day do |attendance| %>
-                所属長承認
-                <span>
-                  <% if day.confirm_superior_for_monthly_attendance.blank? %>
-                    未
-                  <% else %>
-                    <%= day.confirm_superior_for_monthly_attendance %>
-                  <% end %>
-                </span></br>
-                <%= attendance.collection_select :select_superior_for_monthly_attendance, @superiors, :name, :name, {prompt: ""}, class: "form-control" %>
+          <% day = @attendances.find_by(worked_on: @last_day) %>
+          <% if current_user?(@user) || current_user.admin? %>
+            <%= form_with(model: @user, url: attendances_update_monthly_attendance_application_user_path(@user), method: :patch, local: true) do |f| %>
+              <%= f.fields_for "attendance[]", day do |attendance| %>
+                  所属長承認
+                  <span>
+                    <% if day.select_superior_for_monthly_attendance.blank? && day.monthly_attendance_approval_result.blank? %>
+                      未
+                    <% elsif day.select_superior_for_monthly_attendance.present? && day.monthly_attendance_approval_result.blank? %>
+                      <%= day.select_superior_for_monthly_attendance %>へ申請中
+                    <% else day.confirm_superior_for_monthly_attendance.present? %>
+                      <%= day.monthly_attendance_approval_result %>
+                    <% end %>
+                  </span></br>
+                  <%= attendance.collection_select :select_superior_for_monthly_attendance, @superiors, :name, :name, {prompt: ""}, class: "form-control" %>
+              <% end %>
+              <%= f.submit "申請", class: "btn btn-primary btn-sm btn-block", id: "btn-monthly-attendance-application" %>
             <% end %>
-            <%= f.submit "申請", class: "btn btn-primary btn-sm btn-block", id: "btn-monthly-attendance-application" %>
+          <% else %>
+            所属長承認
+              <span>
+                <% if day.select_superior_for_monthly_attendance.blank? && day.monthly_attendance_approval_result.blank? %>
+                  未
+                <% elsif day.select_superior_for_monthly_attendance.present? && day.monthly_attendance_approval_result.blank? %>
+                  <%= day.select_superior_for_monthly_attendance %>へ申請中
+                <% else day.confirm_superior_for_monthly_attendance.present? %>
+                  <%= day.monthly_attendance_approval_result %>
+                <% end %>
+              </span>
           <% end %>
         </td>
       </tr>
@@ -180,5 +207,6 @@
 </div>
 
 <!-- モーダル表示 -->
+<div id="edit-monthly-attendance-approval" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-overtime-application" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-overtime-approval" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

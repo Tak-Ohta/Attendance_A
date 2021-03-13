@@ -13,14 +13,14 @@ class UsersController < ApplicationController
   def show
     # 出勤日数
     @worked_sum = @attendances.where.not(started_at: nil).count
+    # 上長ごとに、1ヶ月分の勤怠申請がされている件数をカウント
+    if current_user.superior?
+      @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name).
+                                                  where(monthly_attendance_approval_result: [nil, '']).count
+    end
     # 上長ごとに、残業申請がされている件数をカウント
     if current_user.superior?
       @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
-    end
-
-    # 上長ごとに、1ヶ月分の勤怠申請がされている件数をカウント
-    if current_user.superior?
-      @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name).count
     end
   end
 

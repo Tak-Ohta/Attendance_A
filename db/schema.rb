@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210312043803) do
+ActiveRecord::Schema.define(version: 20210313124158) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(version: 20210312043803) do
     t.string "confirm_superior_for_overtime"
     t.string "select_superior_for_monthly_attendance"
     t.string "confirm_superior_for_monthly_attendance"
+    t.boolean "monthly_attendance_check_box"
+    t.string "monthly_attendance_approval_result"
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 

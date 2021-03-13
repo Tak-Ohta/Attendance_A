@@ -1,8 +1,13 @@
 class AttendancesController < ApplicationController
 
-  before_action :set_user, only: [:edit_one_month, :update_one_month, :edit_overtime_application, :update_overtime_application]
-  before_action :logged_in_user, only: [:update, :edit_one_month, :update_one_month, :edit_overtime_application, :update_overtime_application]
-  before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month, :edit_overtime_application, :update_overtime_application]
+  before_action :set_user, only: [:edit_one_month, :update_one_month,
+                                  :update_monthly_attendance_application,
+                                  :edit_overtime_application, :update_overtime_application]
+  before_action :logged_in_user, only: [:update, :edit_one_month, :update_one_month,
+                                  :edit_overtime_application, :update_overtime_application]
+  before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month,
+                                  :update_monthly_attendance_application,
+                                  :edit_overtime_application, :update_overtime_application]
   before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval]
   before_action :set_one_month, only: [:edit_one_month, :edit_overtime_application]
   before_action :superiors, only: [:edit_one_month, :edit_overtime_application]
@@ -52,6 +57,55 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_one_month_user_url(date: params[:date])
   end
 
+  # 1ヶ月の勤怠申請
+  def edit_monthly_attendance_application
+  end
+
+  def update_monthly_attendance_application
+    monthly_attendance_application_params.each do |id, item|
+      attendance = Attendance.find(id)
+      attendance.monthly_attendance_approval_result = nil
+      if attendance.update(item)
+        flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ1ヶ月分の勤怠を申請しました。"
+      else
+        flash[:danger] = "1ヶ月分の勤怠申請に失敗しました。"
+      end
+      redirect_to @user
+    end
+  end
+
+  # 1ヶ月の勤怠承認
+  def edit_monthly_attendance_approval
+    @users = User.includes(:attendances).where(attendances: {select_superior_for_monthly_attendance: current_user.name}).
+                                        where(attendances: {monthly_attendance_approval_result: [nil, '']})
+  end
+
+  def update_monthly_attendance_approval
+    monthly_attendance_approval_params.each do |id, item|
+      attendance = Attendance.find(id)
+      user = User.find(attendance.user_id)
+      if monthly_attendance_approval_params[id][:monthly_attendance_check_box] == "true"
+        if monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "承認"
+          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から承認済"
+        elsif monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "否認"
+          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から否認"
+        elsif monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "なし"
+          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}からなし"
+        else monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "申請中"
+          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から保留"
+        end
+        if attendance.update(item)
+          flash[:success] = "変更を送信しました。"
+        else
+          flash[:danger] = "変更を送信できませんでした。"
+        end
+      else
+        flash[:danger] = "#{user.name}の「変更」欄にチェックがありません。"
+      end
+    end
+    redirect_to user_url(current_user)
+  end
+
   # 残業申請
   def edit_overtime_application
     @attendance = @user.attendances.find_by(worked_on: params[:date])
@@ -60,7 +114,7 @@ class AttendancesController < ApplicationController
   def update_overtime_application
     overtime_application_params.each do |id, item|
       attendance = Attendance.find(id)
-      attendance.instructor = "#{attendance.select_superior_for_overtime}へ残業申請中"
+      attendance.instructor = "#{overtime_application_params[id][:select_superior_for_overtime]}へ残業申請中"
       if attendance.update(item)
         flash[:success] = "残業申請が完了しました。"
       else
@@ -102,34 +156,17 @@ class AttendancesController < ApplicationController
       redirect_to user_url(current_user)
   end
 
-  # 1ヶ月の勤怠申請
-  def edit_monthly_attendance_application
-  end
-
-  def update_monthly_attendance_application
-    @user = User.find(params[:id])
-    
-    monthly_attendance_application_params.each do |id, item|
-      attendance = Attendance.find(id)
-      if attendance.update(item)
-        flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ申請しました。"
-      else
-        flash[:danger] = "申請に失敗しました。"
-      end
-      redirect_to @user
-    end
-  end
-
-  # 1ヶ月の勤怠承認
-  def edit_monthly_attendance_approval
-  end
-
-  def update_monthly_attendance_approval
-  end
-
   private
     def attendances_params
       params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day, :note, :instructor])[:attendances]
+    end
+
+    def monthly_attendance_application_params
+      params.require(:user).permit(attendance: :select_superior_for_monthly_attendance)[:attendance]
+    end
+
+    def monthly_attendance_approval_params
+      params.require(:user).permit(attendances: [:confirm_superior_for_monthly_attendance, :monthly_attendance_check_box])[:attendances]
     end
 
     def overtime_application_params
@@ -138,10 +175,6 @@ class AttendancesController < ApplicationController
 
     def overtime_approval_params
       params.require(:user).permit(attendances: [:user_id, :confirm_superior_for_overtime, :approval_check_box])[:attendances]
-    end
-
-    def monthly_attendance_application_params
-      params.require(:user).permit(attendance: :select_superior_for_monthly_attendance)[:attendance]
     end
 
     def admin_or_correct_user

@@ -134,6 +134,27 @@ p {
   margin-top: 10px;
 }
 
+#table-monthly-attendance {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+    width: auto;
+  }
+  td {
+    vertical-align: middle;
+    text-align: center;
+    width: auto;
+  }
+}
+
+.btn-monthly-attendance-approval {
+  margin-top: 15px;
+}
+
 .btn-notice {
   color: black;
   .hover {
@@ -141,7 +162,7 @@ p {
   }
 }
 
-.overtime-notice {
+.application-notice {
   color: red;
 }
 
@@ -177,6 +198,9 @@ p {
 }
 
 #table-overtime-application {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
   th {
     font-weight: normal;
     vertical-align: middle;
@@ -189,8 +213,9 @@ p {
 }
 
 #table-overtime-approval {
-  
-  
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
   h2 {
     margin-top: 30px;
   }
