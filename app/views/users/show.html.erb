@@ -54,7 +54,7 @@
   </div>
   <div class="btn-user-attendance">
     <% if current_user?(@user) || current_user.admin? %>
-      <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
+      <%= link_to "勤怠を編集", attendances_edit_attendances_change_application_user_path(date: @first_day), class: "btn btn-primary" %>
       <%= link_to "CSV出力", '#', class: "btn btn-primary" %>
       <%= link_to "勤怠修正ログ（承認済み）", '#', class: "btn btn-primary" %>
     <% end %>
@@ -102,8 +102,13 @@
         <td><%= l(day.worked_on, format: :short) %></td>
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
         <!-- 出社時間 -->
-        <td><%= day.started_at.floor_to(15.minutes).hour if day.started_at.present? %></td>
-        <td><%= day.started_at.floor_to(15.minutes).min if day.started_at.present? %></td>
+        <% if day.re_change_started_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
+          <td><%= day.re_change_started_at.floor_to(15.minutes).hour if day.re_change_started_at.present? %></td>
+          <td><%= day.re_change_started_at.floor_to(15.minutes).min if day.re_change_started_at.present? %></td>
+        <% else %>
+          <td><%= day.started_at.floor_to(15.minutes).hour if day.started_at.present? %></td>
+          <td><%= day.started_at.floor_to(15.minutes).min if day.started_at.present?  %></td>
+        <% end %>
         <!-- 出勤ボタン -->
         <td>
           <% if current_user?(@user) || current_user.admin? %>
@@ -113,8 +118,13 @@
           <% end %>
         </td>
         <!-- 退社時間 -->
-        <td><%= day.finished_at.floor_to(15.minutes).hour if day.finished_at.present? %></td>
-        <td><%= day.finished_at.floor_to(15.minutes).min if day.finished_at.present? %></td>
+        <% if day.re_change_finished_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
+          <td><%= day.re_change_finished_at.floor_to(15.minutes).hour if day.re_change_finished_at.present? %></td>
+          <td><%= day.re_change_finished_at.floor_to(15.minutes).min if day.re_change_finished_at.present? %></td>
+        <% else %>
+          <td><%= day.finished_at.floor_to(15.minutes).hour if day.finished_at.present? %></td>
+          <td><%= day.finished_at.floor_to(15.minutes).min if day.finished_at.present? %></td>
+        <% end %>
         <!-- 退勤ボタン -->
         <td>
           <% if current_user?(@user) || current_user.admin? %>
@@ -123,7 +133,7 @@
             <% end %>
           <% end %>
         </td>
-        <!-- 在社時間 -->
+        <!-- 在社時間 要修正 -->
         <td>
           <% if day.started_at.present? && day.finished_at.present? %>
             <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
@@ -147,7 +157,7 @@
           <% if day.scheduled_end_time.present? && day.confirm_superior_for_overtime == "承認" %>
             <% designated_work_end_time = date_correction(day.worked_on, @user.designated_work_end_time) %>
             <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
-            <% if day.next_day == true %>
+            <% if day.next_day_for_overtime == true %>
               <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
             <% else %>
               <%= overtime(designated_work_end_time, scheduled_end_time) %>
@@ -157,7 +167,10 @@
         <!-- 業務処理内容 -->
         <td><%= day.work_contents if day.work_contents.present? && day.confirm_superior_for_overtime == "承認" %></td>
         <!-- 指示者確認印 -->
-        <td><%= day.instructor if day.instructor.present? %></td>
+        <td>
+          <%= day.instructor if day.instructor.present? %></br>
+          <%= day.instructor_for_attendances_change if day.instructor_for_attendances_change.present? %>
+        </td>
       </tr>
       <% end %>
     </tbody>

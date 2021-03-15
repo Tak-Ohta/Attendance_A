@@ -17,9 +17,9 @@ Rails.application.routes.draw do
       # 1ヶ月の勤怠承認
       get 'attendances/edit_monthly_attendance_approval'
       patch 'attendances/update_monthly_attendance_approval'
-      # 個々の勤怠編集
-      get 'attendances/edit_one_month'
-      patch 'attendances/update_one_month'
+      # 個々の勤怠変更申請
+      get 'attendances/edit_attendances_change_application'
+      patch 'attendances/update_attendances_change_application'
       # 残業申請
       get 'attendances/edit_overtime_application'
       patch 'attendances/update_overtime_application'

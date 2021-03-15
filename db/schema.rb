@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210313124158) do
+ActiveRecord::Schema.define(version: 20210315121902) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -18,8 +18,8 @@ ActiveRecord::Schema.define(version: 20210313124158) do
     t.datetime "finished_at"
     t.string "note"
     t.datetime "scheduled_end_time"
-    t.boolean "next_day"
-    t.string "instructor"
+    t.boolean "next_day_for_overtime"
+    t.string "instructor" # 残業申請の表示
     t.string "work_contents"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -31,6 +31,15 @@ ActiveRecord::Schema.define(version: 20210313124158) do
     t.string "confirm_superior_for_monthly_attendance"
     t.boolean "monthly_attendance_check_box"
     t.string "monthly_attendance_approval_result"
+    t.datetime "change_started_at"
+    t.datetime "change_finished_at"
+    t.datetime "re_change_started_at"
+    t.datetime "re_change_finished_at"
+    t.string "select_superior_for_attendance_change"
+    t.string "confirm_superior_for_attendance_change"
+    t.boolean "next_day_for_attendance_change"
+    t.boolean "check_box_for_attendance_change"
+    t.string "instructor_for_attendances_change" # 個々の勤怠変更申請の表示
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 

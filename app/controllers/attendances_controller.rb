@@ -1,16 +1,16 @@
 class AttendancesController < ApplicationController
 
-  before_action :set_user, only: [:edit_one_month, :update_one_month,
+  before_action :set_user, only: [:edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application,
                                   :edit_overtime_application, :update_overtime_application]
-  before_action :logged_in_user, only: [:update, :edit_one_month, :update_one_month,
+  before_action :logged_in_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :edit_overtime_application, :update_overtime_application]
-  before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month,
+  before_action :admin_or_correct_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application,
                                   :edit_overtime_application, :update_overtime_application]
   before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval]
-  before_action :set_one_month, only: [:edit_one_month, :edit_overtime_application]
-  before_action :superiors, only: [:edit_one_month, :edit_overtime_application]
+  before_action :set_one_month, only: [:edit_attendances_change_application, :edit_overtime_application]
+  before_action :superiors, only: [:edit_attendances_change_application, :edit_overtime_application]
   before_action :overtime_application, only: [:edit_overtime_application, :update_overtime_application]
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
@@ -40,24 +40,29 @@ class AttendancesController < ApplicationController
     redirect_to @user
   end
 
-  def edit_one_month
+  # 個々の勤怠変更申請
+  def edit_attendances_change_application
   end
-
-  def update_one_month
+  # 修正中：申請後、申請者の指示者確認印に「勤怠変更申請中」と表示するようにする！
+  def update_attendances_change_application
+    
     ActiveRecord::Base.transaction do
-      attendances_params.each do |id, item|
+      attendances_change_params.each do |id, item|
         attendance = Attendance.find(id)
+        unless attendances_change_params[id][:select_superior_for_attendance_change].nil?
+          attendance.instructor_for_attendances_change = "#{attendances_change_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
+        end
         attendance.update!(item)
       end
     end
-    flash[:success] = "1ヶ月分の勤怠情報を更新しました。"
+    flash[:success] = "勤怠の変更申請を送信しました。"
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid
     flash[:danger] = "無効な入力データがあったため、更新をキャンセルしました。"
     redirect_to attendances_edit_one_month_user_url(date: params[:date])
   end
 
-  # 1ヶ月の勤怠申請
+  # 1ヶ月の勤怠承認申請
   def edit_monthly_attendance_application
   end
 
@@ -157,8 +162,8 @@ class AttendancesController < ApplicationController
   end
 
   private
-    def attendances_params
-      params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day, :note, :instructor])[:attendances]
+    def attendances_change_params
+      params.require(:user).permit(attendances: [:re_change_started_at, :re_change_finished_at, :next_day_for_attendance_change, :note, :select_superior_for_attendance_change])[:attendances]
     end
 
     def monthly_attendance_application_params
@@ -170,7 +175,7 @@ class AttendancesController < ApplicationController
     end
 
     def overtime_application_params
-      params.require(:user).permit(attendances: [:scheduled_end_time, :next_day, :work_contents, :instructor, :select_superior_for_overtime])[:attendances]
+      params.require(:user).permit(attendances: [:scheduled_end_time, :next_day_for_overtime, :work_contents, :instructor, :select_superior_for_overtime])[:attendances]
     end
 
     def overtime_approval_params
