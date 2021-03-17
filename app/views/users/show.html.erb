@@ -42,7 +42,12 @@
         <%= link_to "【所属長承認申請のお知らせ】", '#', class: "btn-notice" %><br>
       <% end %>
       <!-- 勤怠変更申請 -->
-      <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
+      <% if @attendances_change_application >= 1 %>
+        <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %>
+        <span style="border: solid 2px red; color: red;"><%= @attendances_change_application %>件の通知があります。</span><br>
+      <% else %>
+        <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
+      <% end %>
       <!-- 残業申請 -->
       <% if @overtime_application >= 1 %>
         <%= link_to "【残業申請のお知らせ】", attendances_edit_overtime_approval_user_path, remote: true, class: "btn-notice application-notice" %>
@@ -103,11 +108,11 @@
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
         <!-- 出社時間 -->
         <% if day.re_change_started_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
-          <td><%= day.re_change_started_at.floor_to(15.minutes).hour if day.re_change_started_at.present? %></td>
-          <td><%= day.re_change_started_at.floor_to(15.minutes).min if day.re_change_started_at.present? %></td>
+          <td><%= day.re_change_started_at.strftime("%H").floor_to(15.minutes).strftime("%H") if day.re_change_started_at.present? %></td>
+          <td><%= day.re_change_started_at.strftime("%M").floor_to(15.minutes).strftime("%M") if day.re_change_started_at.present? %></td>
         <% else %>
-          <td><%= day.started_at.floor_to(15.minutes).hour if day.started_at.present? %></td>
-          <td><%= day.started_at.floor_to(15.minutes).min if day.started_at.present?  %></td>
+          <td><%= day.started_at.floor_to(15.minutes).strftime("%H") if day.started_at.present? %></td>
+          <td><%= day.started_at.floor_to(15.minutes).strftime("%M") if day.started_at.present?  %></td>
         <% end %>
         <!-- 出勤ボタン -->
         <td>
@@ -119,11 +124,11 @@
         </td>
         <!-- 退社時間 -->
         <% if day.re_change_finished_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
-          <td><%= day.re_change_finished_at.floor_to(15.minutes).hour if day.re_change_finished_at.present? %></td>
-          <td><%= day.re_change_finished_at.floor_to(15.minutes).min if day.re_change_finished_at.present? %></td>
+          <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%H") if day.re_change_finished_at.present? %></td>
+          <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%M") if day.re_change_finished_at.present? %></td>
         <% else %>
-          <td><%= day.finished_at.floor_to(15.minutes).hour if day.finished_at.present? %></td>
-          <td><%= day.finished_at.floor_to(15.minutes).min if day.finished_at.present? %></td>
+          <td><%= day.finished_at.floor_to(15.minutes).strftime("%H") if day.finished_at.present? %></td>
+          <td><%= day.finished_at.floor_to(15.minutes).strftime("%M") if day.finished_at.present? %></td>
         <% end %>
         <!-- 退勤ボタン -->
         <td>
@@ -135,21 +140,23 @@
         </td>
         <!-- 在社時間 要修正 -->
         <td>
-          <% if day.started_at.present? && day.finished_at.present? %>
+          <% if day.re_change_started_at.present? && day.re_change_finished_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
+            <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.floor_to(15.minutes)) %>
+          <% elsif day.started_at.present? && day.finished_at.present? %>
             <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-            <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
           <% end %>
+          <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
         </td>
         <td><%= day.note %></td>
         <!-- 終了予定時間 -->
         <td>
           <% if day.confirm_superior_for_overtime == "承認" %>
-            <%= day.scheduled_end_time.floor_to(15.minutes).hour if day.scheduled_end_time.present? %>
+            <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%H") if day.scheduled_end_time.present? %>
           <% end %>
         </td>
         <td>
           <% if day.confirm_superior_for_overtime == "承認" %>
-            <%= day.scheduled_end_time.floor_to(15.minutes).min if day.scheduled_end_time.present? %>
+            <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%M") if day.scheduled_end_time.present? %>
           <% end %> 
         </td>
         <!-- 時間外時間 -->

@@ -40,28 +40,6 @@ class AttendancesController < ApplicationController
     redirect_to @user
   end
 
-  # 個々の勤怠変更申請
-  def edit_attendances_change_application
-  end
-  # 修正中：申請後、申請者の指示者確認印に「勤怠変更申請中」と表示するようにする！
-  def update_attendances_change_application
-    
-    ActiveRecord::Base.transaction do
-      attendances_change_params.each do |id, item|
-        attendance = Attendance.find(id)
-        unless attendances_change_params[id][:select_superior_for_attendance_change].nil?
-          attendance.instructor_for_attendances_change = "#{attendances_change_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
-        end
-        attendance.update!(item)
-      end
-    end
-    flash[:success] = "勤怠の変更申請を送信しました。"
-    redirect_to user_url(date: params[:date])
-  rescue ActiveRecord::RecordInvalid
-    flash[:danger] = "無効な入力データがあったため、更新をキャンセルしました。"
-    redirect_to attendances_edit_one_month_user_url(date: params[:date])
-  end
-
   # 1ヶ月の勤怠承認申請
   def edit_monthly_attendance_application
   end
@@ -110,6 +88,31 @@ class AttendancesController < ApplicationController
     end
     redirect_to user_url(current_user)
   end
+
+  # 個々の勤怠変更申請
+  def edit_attendances_change_application
+  end
+  # 修正中：申請後、申請者の指示者確認印に「勤怠変更申請中」と表示するようにする！
+  def update_attendances_change_application
+    
+    ActiveRecord::Base.transaction do
+      attendances_change_params.each do |id, item|
+        attendance = Attendance.find(id)
+        unless attendances_change_params[id][:select_superior_for_attendance_change].nil?
+          attendance.instructor_for_attendances_change = "#{attendances_change_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
+          attendance.confirm_superior_for_attendance_change = nil
+        end
+        attendance.update!(item)
+      end
+    end
+    flash[:success] = "勤怠の変更申請を送信しました。"
+    redirect_to user_url(date: params[:date])
+  rescue ActiveRecord::RecordInvalid
+    flash[:danger] = "無効な入力データがあったため、更新をキャンセルしました。"
+    redirect_to attendances_edit_one_month_user_url(date: params[:date])
+  end
+
+
 
   # 残業申請
   def edit_overtime_application
