@@ -43,7 +43,7 @@
       <% end %>
       <!-- 勤怠変更申請 -->
       <% if @attendances_change_application >= 1 %>
-        <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %>
+        <%= link_to "【勤怠変更申請のお知らせ】", attendances_edit_attendances_change_approval_user_path, remote: true, class: "btn-notice" %>
         <span style="border: solid 2px red; color: red;"><%= @attendances_change_application %>件の通知があります。</span><br>
       <% else %>
         <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
@@ -228,5 +228,6 @@
 
 <!-- モーダル表示 -->
 <div id="edit-monthly-attendance-approval" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="edit-attendances-change-approval" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-overtime-application" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="edit-overtime-approval" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

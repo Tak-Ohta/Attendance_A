@@ -11,19 +11,19 @@ Rails.application.routes.draw do
     member do
       get 'edit_basic_info'
       patch 'update_basic_info'
-      # 1ヶ月の勤怠申請
+      # 1ヶ月の勤怠申請・承認
       get 'attendances/edit_monthly_attendance_application'
       patch 'attendances/update_monthly_attendance_application'
-      # 1ヶ月の勤怠承認
       get 'attendances/edit_monthly_attendance_approval'
       patch 'attendances/update_monthly_attendance_approval'
-      # 個々の勤怠変更申請
+      # 個々の勤怠変更申請・承認
       get 'attendances/edit_attendances_change_application'
       patch 'attendances/update_attendances_change_application'
-      # 残業申請
+      get 'attendances/edit_attendances_change_approval'
+      patch 'attendances/update_attendances_change_approval'
+      # 残業申請・承認
       get 'attendances/edit_overtime_application'
       patch 'attendances/update_overtime_application'
-      # 残業承認
       get 'attendances/edit_overtime_approval'
       patch 'attendances/update_overtime_approval'
     end

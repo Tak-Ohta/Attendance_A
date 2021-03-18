@@ -89,10 +89,10 @@ class AttendancesController < ApplicationController
     redirect_to user_url(current_user)
   end
 
-  # 個々の勤怠変更申請
+  # 勤怠変更申請
   def edit_attendances_change_application
   end
-  # 修正中：申請後、申請者の指示者確認印に「勤怠変更申請中」と表示するようにする！
+  
   def update_attendances_change_application
     
     ActiveRecord::Base.transaction do
@@ -112,6 +112,14 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_one_month_user_url(date: params[:date])
   end
 
+  # 勤怠変更申請承認
+  def edit_attendances_change_approval
+    @users = User.includes(:attendances).where(attendances: { select_superior_for_attendance_change: current_user.name }).
+                                        where(attendances: { confirm_superior_for_attendance_change: [nil, ''] })
+  end
+
+  def update_attendances_change_approval
+  end
 
 
   # 残業申請
