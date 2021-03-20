@@ -53,7 +53,7 @@ class AttendancesController < ApplicationController
       else
         flash[:danger] = "1ヶ月分の勤怠申請に失敗しました。"
       end
-      redirect_to @user
+      redirect_to user_url(@user, date: attendance.worked_on.beginning_of_month)
     end
   end
 
@@ -121,10 +121,10 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do
       attendances_change_approval_params.each do |id, item|
         attendance = Attendance.find(id)
-        if attendances_change_approval_params[id][:check_box_for_attendance_change] = "true"
-          if attendances_change_approval_params[id][:confirm_superior_for_attendance_change] = "承認"
+        if attendances_change_approval_params[id][:check_box_for_attendance_change] == "true"
+          if attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "承認"
             attendance.instructor_for_attendances_change = "勤怠変更承認済"
-          elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] = "否認"
+          elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "否認"
             attendance.instructor_for_attendances_change = "勤怠変更否認"
           end
           attendance.select_superior_for_attendance_change = nil
@@ -154,7 +154,7 @@ class AttendancesController < ApplicationController
       else
         flash[:danger] = "残業申請に失敗しました。無効な入力、もしくは、未入力がないか確認してください。"
       end
-      redirect_to @user
+      redirect_to user_url(@user, date: attendance.worked_on.beginning_of_month)
     end
   end
 

@@ -43,7 +43,7 @@
       <% end %>
       <!-- 勤怠変更申請 -->
       <% if @attendances_change_application >= 1 %>
-        <%= link_to "【勤怠変更申請のお知らせ】", attendances_edit_attendances_change_approval_user_path, remote: true, class: "btn-notice" %>
+        <%= link_to "【勤怠変更申請のお知らせ】", attendances_edit_attendances_change_approval_user_path, remote: true, class: "btn-notice application-notice" %>
         <span style="border: solid 2px red; color: red;"><%= @attendances_change_application %>件の通知があります。</span><br>
       <% else %>
         <%= link_to "【勤怠変更申請のお知らせ】", '#', class: "btn-notice" %><br>
@@ -138,12 +138,20 @@
             <% end %>
           <% end %>
         </td>
-        <!-- 在社時間 要修正 -->
+        <!-- 在社時間 要修正：翌日チェックの場合の計算 -->
         <td>
           <% if day.re_change_started_at.present? && day.re_change_finished_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
-            <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.floor_to(15.minutes)) %>
+            <% if day.next_day_for_attendance_change == true %>
+              <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.tomorrow.floor_to(15.minutes)) %>
+            <% else %>
+              <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.floor_to(15.minutes)) %>
+            <% end %>
           <% elsif day.started_at.present? && day.finished_at.present? %>
-            <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+            <% if day.next_day_for_attendance_change == true %>
+              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
+            <% else %>
+              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+            <% end %>
           <% end %>
           <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
         </td>

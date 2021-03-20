@@ -42,7 +42,7 @@
                           <% if day.scheduled_end_time.present? %>
                             <% designated_work_end_time = date_correction(day.worked_on, user.designated_work_end_time) %>
                             <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
-                            <% if day.next_day == true %>
+                            <% if day.next_day_for_overtime == true %>
                               <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
                             <% else %>
                               <%= overtime(designated_work_end_time, scheduled_end_time) %>
