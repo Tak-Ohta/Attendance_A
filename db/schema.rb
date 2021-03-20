@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 20210315121902) do
     t.string "note"
     t.datetime "scheduled_end_time"
     t.boolean "next_day_for_overtime"
-    t.string "instructor" # 残業申請の表示
+    t.string "instructor"
     t.string "work_contents"
     t.integer "user_id"
     t.datetime "created_at", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 20210315121902) do
     t.string "confirm_superior_for_attendance_change"
     t.boolean "next_day_for_attendance_change"
     t.boolean "check_box_for_attendance_change"
-    t.string "instructor_for_attendances_change" # 個々の勤怠変更申請の表示
+    t.string "instructor_for_attendances_change"
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
@@ -58,9 +58,9 @@ ActiveRecord::Schema.define(version: 20210315121902) do
     t.integer "employee_number"
     t.string "uid"
     t.string "password_digest"
-    t.datetime "basic_work_time", default: "2021-02-22 23:00:00"
-    t.datetime "designated_work_start_time", default: "2021-02-23 00:00:00"
-    t.datetime "designated_work_end_time", default: "2021-02-23 09:00:00"
+    t.datetime "basic_work_time", default: "2021-03-19 23:00:00"
+    t.datetime "designated_work_start_time", default: "2021-03-20 00:00:00"
+    t.datetime "designated_work_end_time", default: "2021-03-20 09:00:00"
     t.boolean "superior"
     t.boolean "admin"
     t.datetime "created_at", null: false

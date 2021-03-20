@@ -15,7 +15,7 @@
           <%= form_with(model: @users, url: attendances_update_attendances_change_approval_user_path(@users), method: :patch, local: true) do |f| %>
             <% @users.each do |user| %>
               <h2>【<%= user.name %>からの勤怠変更申請】</h2>
-              <table class="table table-bordered table-condensed table-hover">
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances-change">
                 <thead>
                   <tr>
                     <th rowspan="3">日付</th>
@@ -46,22 +46,55 @@
                 </thead>
                 <tbody>
                   <% user.attendances.each do |day| %>
-                    <%= fields_for "attendances[]", day do |attendance| %>
+                    <%= f.fields_for "attendances[]", day do |attendance| %>
                       <tr>
                         <td><%= l(day.worked_on, format: :short) %></td>
                         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <!-- 変更前：出社：時 -->
+                        <td>
+                          <% if day.change_started_at.present? %>
+                            <%= day.change_started_at.floor_to(15.minutes).strftime("%H") %>
+                          <% elsif day.started_at.present? %>
+                            <%= day.started_at.floor_to(15.minutes).strftime("%H") %>
+                          <% end %>
+                        </td>
+                        <!-- 変更前：出社：分 -->
+                        <td>
+                          <% if day.change_started_at.present? %>
+                            <%= day.change_started_at.floor_to(15.minutes).strftime("%M") %>
+                          <% elsif day.started_at.present? %>
+                            <%= day.started_at.floor_to(15.minutes).strftime("%M") %>
+                          <% end %>
+                        </td>
+                        <!-- 変更前：退社：時 -->
+                        <td>
+                          <% if day.change_finished_at.present? %>
+                            <%= day.change_finished_at.floor_to(15.minutes).strftime("%H") %>
+                          <% elsif day.finished_at.present? %>
+                            <%= day.finished_at.floor_to(15.minutes).strftime("%H") %>
+                          <% end %>
+                        </td>
+                        <!-- 変更前：退社：分 -->
+                        <td>
+                          <% if day.change_finished_at.present? %>
+                            <%= day.change_finished_at.floor_to(15.minutes).strftime("%M") %>
+                          <% elsif day.finished_at.present? %>
+                            <%= day.finished_at.floor_to(15.minutes).strftime("%M") %>
+                          <% end %>
+                        </td>
+                        <!-- 変更後：出社：時・分 -->
+                        <td><%= day.re_change_started_at.floor_to(15.minutes).strftime("%H") %></td>
+                        <td><%= day.re_change_started_at.floor_to(15.minutes).strftime("%M") %></td>
+                        <!-- 変更後：退社：時・分 -->
+                        <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%H") %></td>
+                        <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%M") %></td>
+                        <!-- 備考 -->
+                        <td><%= day.note %></td>
+                        <!-- 指示者確認印 -->
+                        <td><%= attendance.select :confirm_superior_for_attendance_change, [["ｰｰｰ"], ["承認"], ["否認"]] %></td>
+                        <!-- 変更 -->
+                        <td><%= attendance.check_box :check_box_for_attendance_change, {}, true, false %></td>
+                        <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
                       </tr>
                     <% end %>
                   <% end %>

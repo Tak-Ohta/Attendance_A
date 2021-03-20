@@ -94,12 +94,11 @@ class AttendancesController < ApplicationController
   end
   
   def update_attendances_change_application
-    
     ActiveRecord::Base.transaction do
-      attendances_change_params.each do |id, item|
+      attendances_change_application_params.each do |id, item|
         attendance = Attendance.find(id)
-        unless attendances_change_params[id][:select_superior_for_attendance_change].nil?
-          attendance.instructor_for_attendances_change = "#{attendances_change_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
+        unless attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
+          attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
           attendance.confirm_superior_for_attendance_change = nil
         end
         attendance.update!(item)
@@ -119,6 +118,25 @@ class AttendancesController < ApplicationController
   end
 
   def update_attendances_change_approval
+    ActiveRecord::Base.transaction do
+      attendances_change_approval_params.each do |id, item|
+        attendance = Attendance.find(id)
+        if attendances_change_approval_params[id][:check_box_for_attendance_change] = "true"
+          if attendances_change_approval_params[id][:confirm_superior_for_attendance_change] = "承認"
+            attendance.instructor_for_attendances_change = "勤怠変更承認済"
+          elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] = "否認"
+            attendance.instructor_for_attendances_change = "勤怠変更否認"
+          end
+          attendance.select_superior_for_attendance_change = nil
+          attendance.update!(item)
+        end
+      end
+    end
+    flash[:success] = "勤怠変更申請を送信しました。"
+    redirect_to user_url(current_user)
+  rescue ActiveRecord::RecordInvalid
+    flash[:danger] = "勤怠変更申請の送信に失敗しました。"
+    redirect_to user_url(current_user)
   end
 
 
@@ -173,16 +191,20 @@ class AttendancesController < ApplicationController
   end
 
   private
-    def attendances_change_params
-      params.require(:user).permit(attendances: [:re_change_started_at, :re_change_finished_at, :next_day_for_attendance_change, :note, :select_superior_for_attendance_change])[:attendances]
-    end
-
     def monthly_attendance_application_params
       params.require(:user).permit(attendance: :select_superior_for_monthly_attendance)[:attendance]
     end
 
     def monthly_attendance_approval_params
       params.require(:user).permit(attendances: [:confirm_superior_for_monthly_attendance, :monthly_attendance_check_box])[:attendances]
+    end
+
+    def attendances_change_application_params
+      params.require(:user).permit(attendances: [:re_change_started_at, :re_change_finished_at, :next_day_for_attendance_change, :note, :select_superior_for_attendance_change])[:attendances]
+    end
+
+    def attendances_change_approval_params
+      params.require(:user).permit(attendances: [:confirm_superior_for_attendance_change, :check_box_for_attendance_change])[:attendances]
     end
 
     def overtime_application_params

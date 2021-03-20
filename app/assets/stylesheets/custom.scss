@@ -116,6 +116,7 @@ p {
   }
 }
 
+/* 勤怠表 */
 #table-attendances {
   margin-top: 20px;
   th {
@@ -128,31 +129,6 @@ p {
     vertical-align: middle;
     text-align: center;
   }
-}
-
-#btn-monthly-attendance-application {
-  margin-top: 10px;
-}
-
-#table-monthly-attendance {
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  th {
-    font-weight: normal;
-    vertical-align: middle;
-    text-align: center;
-    width: auto;
-  }
-  td {
-    vertical-align: middle;
-    text-align: center;
-    width: auto;
-  }
-}
-
-.btn-monthly-attendance-approval {
-  margin-top: 15px;
 }
 
 .btn-notice {
@@ -185,7 +161,42 @@ p {
   margin-top: 5px;
 }
 
-#table-at-work {
+
+/* 1ヶ月分の勤怠承認申請 */
+#table-monthly-attendance {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+    width: auto;
+  }
+  td {
+    vertical-align: middle;
+    text-align: center;
+    width: auto;
+  }
+}
+
+#btn-monthly-attendance-application {
+  margin-top: 10px;
+}
+
+.btn-monthly-attendance-approval {
+  margin-top: 15px;
+}
+
+
+/* 勤怠変更申請・承認 */
+#table-attendances-change {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  h2 {
+    margin-top: 30px;
+  }
   th {
     font-weight: normal;
     vertical-align: middle;
@@ -197,6 +208,8 @@ p {
   }
 }
 
+
+/* 残業申請・承認 */
 #table-overtime-application {
   width: 95%;
   margin-left: auto;
@@ -230,6 +243,21 @@ p {
   }
 }
 
+
+/* 出勤中社員一覧 */
+#table-at-work {
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+  }
+  td {
+    vertical-align: middle;
+    text-align: center;
+  }
+}
+
+/* 拠点情報 */
 #table-base-point {
   margin-top: 15px;
   th {
