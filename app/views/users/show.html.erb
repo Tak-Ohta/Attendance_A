@@ -173,10 +173,11 @@
             <% designated_work_end_time = date_correction(day.worked_on, @user.designated_work_end_time) %>
             <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
             <% if day.next_day_for_overtime == true %>
-              <%= overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
+              <%= overtime = overtime(designated_work_end_time, scheduled_end_time.tomorrow) %>
             <% else %>
-              <%= overtime(designated_work_end_time, scheduled_end_time) %>
+              <%= overtime = overtime(designated_work_end_time, scheduled_end_time) %>
             <% end %>
+            <% @total_overtime = @total_overtime.to_f + overtime.to_f %>
           <% end %>
         </td>
         <!-- 業務処理内容 -->
@@ -195,7 +196,10 @@
         <td colspan="2"></td>
         <td colspan="6"></td>
         <td><%= format("%.2f", @total_working_time.to_f) %></td>
-        <td colspan="5"></td>
+        <td colspan="3"></td>
+        <!-- 時間外時間合計 -->
+        <td><%= format("%.2f", @total_overtime.to_f) %></td>
+        <td></td>
         <!-- 1ヶ月分の勤怠を申請する -->
         <td>
           <% day = @attendances.find_by(worked_on: @last_day) %>
