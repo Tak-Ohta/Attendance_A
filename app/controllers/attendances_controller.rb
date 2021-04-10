@@ -2,14 +2,14 @@ class AttendancesController < ApplicationController
 
   before_action :set_user, only: [:edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application,
-                                  :edit_overtime_application, :update_overtime_application, :index_attendances_log]
+                                  :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :logged_in_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
-                                  :edit_overtime_application, :update_overtime_application, :index_attendances_log]
+                                  :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :admin_or_correct_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application,
-                                  :edit_overtime_application, :update_overtime_application, :index_attendances_log]
+                                  :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval]
-  before_action :set_one_month, only: [:edit_attendances_change_application, :edit_overtime_application, :index_attendances_log]
+  before_action :set_one_month, only: [:edit_attendances_change_application, :edit_overtime_application, :attendance_log]
   before_action :superiors, only: [:edit_attendances_change_application, :edit_overtime_application]
   before_action :overtime_application, only: [:edit_overtime_application, :update_overtime_application]
 
@@ -191,7 +191,7 @@ class AttendancesController < ApplicationController
   end
 
   # 勤怠ログ
-  def index_attendances_log
+  def attendance_log
     @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" }).order(:worked_on)
   end
 

@@ -61,7 +61,7 @@
     <% if current_user?(@user) || current_user.admin? %>
       <%= link_to "勤怠を編集", attendances_edit_attendances_change_application_user_path(date: @first_day), class: "btn btn-primary" %>
       <%= link_to "CSV出力", '#', class: "btn btn-primary" %>
-      <%= link_to "勤怠修正ログ（承認済み）", attendances_index_attendances_log_user_path(@user), class: "btn btn-primary" %>
+      <%= link_to "勤怠修正ログ（承認済み）", attendances_attendance_log_user_path(@user), class: "btn btn-primary" %>
     <% end %>
   </div>  
 

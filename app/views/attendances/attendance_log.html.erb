@@ -1,0 +1,50 @@
+<% provide(:title, "#{@user.name}勤怠ログ") %>
+
+<div class="row">
+  <h2>勤怠ログ</h2>
+
+  <div class="col-md-3">
+    <%= form_with(url: attendances_attendance_log_user_path, local: true, method: :get) do |f| %>
+      <%= f.submit "検索", class: "btn btn-primary" %>
+      <table class="table table-bordered table-condensed" id="attendance-log-search">
+        <tr>
+          <th>年</th>
+          <td></td>
+        </tr>
+        <tr>
+          <th>月</th>
+          <td></td>
+        </tr>
+      </table>
+    <% end %>
+  </div>
+  <div class="col-md-12">
+    <table class="table table-bordered table-condensed table-hover" id="attendance-log">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>変更前出社時間</th>
+          <th>変更前退社時間</th>
+          <th>変更後出社時間</th>
+          <th>変更後退社時間</th>
+          <th>指示者</th>
+          <th>承認日</th>
+        </tr>
+      </thead>
+      <% @attendances.each do |attendance| %>
+        <tr>
+          <td><%= attendance.worked_on %></td>
+          <td><%= attendance.started_at.floor_to(15.minutes).strftime("%R") if attendance.started_at.present? %></td>
+          <td><%= attendance.finished_at.floor_to(15.minutes).strftime("%R") if attendance.finished_at.present? %></td>
+          <td><%= attendance.re_change_started_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_started_at.present? %></td>
+          <td><%= attendance.re_change_finished_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_finished_at.present? %></td>
+          <td><%= attendance.select_superior_for_attendance_change %></td>
+          <td><%= attendance.attendances_change_approval_day.strftime("%F") %></td>
+        </tr>
+      <% end %>
+    </table>
+    <table>
+      
+    </table>
+  </div>
+</div>

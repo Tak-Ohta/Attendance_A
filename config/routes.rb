@@ -27,7 +27,7 @@ Rails.application.routes.draw do
       get 'attendances/edit_overtime_approval'
       patch 'attendances/update_overtime_approval'
       # 勤怠ログ
-      get 'attendances/index_attendances_log'
+      get 'attendances/attendance_log'
     end
 
     resources :attendances, only: :update
