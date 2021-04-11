@@ -4,16 +4,16 @@
   <h2>勤怠ログ</h2>
 
   <div class="col-md-3">
-    <%= form_with(url: attendances_attendance_log_user_path, local: true, method: :get) do |f| %>
+    <%= form_with(model: @attendances, url: attendances_attendance_log_user_path, local: true, method: :get) do |f| %>
       <%= f.submit "検索", class: "btn btn-primary" %>
       <table class="table table-bordered table-condensed" id="attendance-log-search">
         <tr>
           <th>年</th>
-          <td></td>
+          <td><%= f.date_select :worked_on, discard_month: true, discard_day: true, promt: "---", class: "form-control" %></td>
         </tr>
         <tr>
           <th>月</th>
-          <td></td>
+          <td><%= f.date_select :worked_on,use_month_numbers: true, discard_year: true, discard_day: true, promt: "---", class: "form-control" %></td>
         </tr>
       </table>
     <% end %>
@@ -31,16 +31,18 @@
           <th>承認日</th>
         </tr>
       </thead>
-      <% @attendances.each do |attendance| %>
-        <tr>
-          <td><%= attendance.worked_on %></td>
-          <td><%= attendance.started_at.floor_to(15.minutes).strftime("%R") if attendance.started_at.present? %></td>
-          <td><%= attendance.finished_at.floor_to(15.minutes).strftime("%R") if attendance.finished_at.present? %></td>
-          <td><%= attendance.re_change_started_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_started_at.present? %></td>
-          <td><%= attendance.re_change_finished_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_finished_at.present? %></td>
-          <td><%= attendance.select_superior_for_attendance_change %></td>
-          <td><%= attendance.attendances_change_approval_day.strftime("%F") %></td>
-        </tr>
+      <% if @search_result.present? %>
+        <% @attendances.each do |attendance| %>
+          <tr>
+            <td><%= attendance.worked_on %></td>
+            <td><%= attendance.started_at.floor_to(15.minutes).strftime("%R") if attendance.started_at.present? %></td>
+            <td><%= attendance.finished_at.floor_to(15.minutes).strftime("%R") if attendance.finished_at.present? %></td>
+            <td><%= attendance.re_change_started_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_started_at.present? %></td>
+            <td><%= attendance.re_change_finished_at.floor_to(15.minutes).strftime("%R") if attendance.re_change_finished_at.present? %></td>
+            <td><%= attendance.select_superior_for_attendance_change %></td>
+            <td><%= attendance.attendances_change_approval_day.strftime("%F") %></td>
+          </tr>
+        <% end %>
       <% end %>
     </table>
     <table>

@@ -17,4 +17,5 @@ class Attendance < ApplicationRecord
       errors.add(:started_at, "より早い退社時間は無効です。") if started_at > finished_at
     end
   end
+  
 end

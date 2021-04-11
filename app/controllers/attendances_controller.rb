@@ -21,6 +21,7 @@ class AttendancesController < ApplicationController
     
   end
   
+  # 出退勤打刻
   def update
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
@@ -100,6 +101,16 @@ class AttendancesController < ApplicationController
         unless attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
           attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
           attendance.confirm_superior_for_attendance_change = nil
+        end
+        if attendance.started_at.blank?
+          attendance.started_at = attendances_change_application_params[id][:re_change_started_at]
+        end
+        if attendance.finished_at.blank?
+          if attendances_change_application_params[id][:next_day_for_attendance_change] == "true"
+            attendance.finished_at = attendances_change_application_params[id][:re_change_finished_at].to_time.tomorrow
+          else
+            attendance.finished_at = attendances_change_application_params[id][:re_change_finished_at]
+          end
         end
         attendance.update!(item)
       end
@@ -192,7 +203,14 @@ class AttendancesController < ApplicationController
 
   # 勤怠ログ
   def attendance_log
-    @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" }).order(:worked_on)
+    if params[:attendance].present?
+      @search_result = params[:attendance]
+      date = Date.new @search_result["worked_on(1i)"].to_i, @search_result["worked_on(2i)"].to_i, @search_result["worked_on(3i)"].to_i
+      search_date = date.strftime('%Y-%m')
+    
+      @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" })
+                                      .where( "worked_on LIKE ?", "#{search_date}%" )
+    end
   end
 
   private
@@ -219,6 +237,7 @@ class AttendancesController < ApplicationController
     def overtime_approval_params
       params.require(:user).permit(attendances: [:user_id, :confirm_superior_for_overtime, :approval_check_box])[:attendances]
     end
+
 
     def admin_or_correct_user
       @user = User.find(params[:user_id]) if @user.blank?

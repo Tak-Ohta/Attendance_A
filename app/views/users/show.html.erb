@@ -147,11 +147,7 @@
               <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.floor_to(15.minutes)) %>
             <% end %>
           <% elsif day.started_at.present? && day.finished_at.present? %>
-            <% if day.next_day_for_attendance_change == true %>
-              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
-            <% else %>
-              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-            <% end %>
+            <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
           <% end %>
           <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
         </td>
