@@ -5,17 +5,13 @@
 
   <div class="col-md-3">
     <%= form_with(model: @attendances, url: attendances_attendance_log_user_path, local: true, method: :get) do |f| %>
-      <%= f.submit "検索", class: "btn btn-primary" %>
-      <table class="table table-bordered table-condensed" id="attendance-log-search">
+      <table class="table table-bordered" id="attendance-log-search">
         <tr>
-          <th>年</th>
-          <td><%= f.date_select :worked_on, discard_month: true, discard_day: true, promt: "---", class: "form-control" %></td>
-        </tr>
-        <tr>
-          <th>月</th>
-          <td><%= f.date_select :worked_on,use_month_numbers: true, discard_year: true, discard_day: true, promt: "---", class: "form-control" %></td>
+          <th>年月</th>
+          <td><%= f.date_select :worked_on, discard_day: true, use_month_numbers: true, promt: "---", class: "form-control search-date" %></td>
         </tr>
       </table>
+      <%= f.submit "検索", class: "btn btn-primary btn-block" %>
     <% end %>
   </div>
   <div class="col-md-12">

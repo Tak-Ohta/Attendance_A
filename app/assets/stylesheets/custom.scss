@@ -209,7 +209,7 @@ p {
 }
 
 
-/* 残業申請・承認 */
+/* 残業申請 */
 #table-overtime-application {
   width: 95%;
   margin-left: auto;
@@ -225,6 +225,7 @@ p {
   }
 }
 
+/* 残業承認 */
 #table-overtime-approval {
   width: 95%;
   margin-left: auto;
@@ -238,6 +239,39 @@ p {
     text-align: center;
   }
   td {
+    vertical-align: middle;
+    text-align: center;
+  }
+}
+
+/* 勤怠ログ */
+#attendance-log-search {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+  }
+  td {
+    font-weight: normal;
+    vertical-align: middle;
+  }
+}
+
+.search-date {
+  display: inline-block;
+}
+
+#attendance-log {
+  margin-top: 30px;
+  th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: center;
+  }
+  td {
+    font-weight: normal;
     vertical-align: middle;
     text-align: center;
   }
