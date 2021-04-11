@@ -28,6 +28,35 @@ class UsersController < ApplicationController
     if current_user.superior?
       @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
     end
+
+    # csv出力
+    respond_to do |format|
+      format.html
+      format.csv do |csv|
+        send_attendances_csv(@attendances)
+      end
+    end
+  end
+
+  # 勤怠csv出力
+  def send_attendances_csv(attendances)
+    csv_data = CSV.generate(headers: true) do |csv|
+      header = ["名前", "日付", "出社時間", "退社時間", "変更後出社時間", "変更後退社時間"]
+      # 表のカラム名を定義
+      csv << header
+      # column_valuesに代入するカラム値を定義
+      attendances.each do |attendance|
+        values = [User.find_by(id: attendance.user_id).name, attendance.worked_on,
+          attendance.started_at.present? ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.finished_at.present? ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.re_change_started_at.present? ? attendance.re_change_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.re_change_finished_at.present? ? attendance.re_change_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil
+        ]
+        # 表の値を定義
+        csv << values
+      end
+    end
+    send_data(csv_data, filename: "attendances-#{Time.zone.now.strftime('%Y%m%d%S')}.csv")
   end
 
   def create
