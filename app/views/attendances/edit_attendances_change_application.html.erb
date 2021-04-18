@@ -25,10 +25,10 @@
               <td><%= $days_of_the_week[day.worked_on.wday] %></td>
               <td><%= attendance.time_field :re_change_started_at, class: "form-control" %></td>
               <td><%= attendance.time_field :re_change_finished_at, class: "form-control" %></td>
-              <td><%= attendance.check_box :next_day_for_attendance_change, {}, true, false %></td>
+              <td><%= attendance.check_box :next_day_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %></td>
               <td></td>
               <td><%= attendance.text_field :note, class: "form-control" %></td>
-              <td><%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {prompt: ""}, class: "form-control" %></td>
+              <td><%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {include_blank: true}, {class: "form-control"} %></td>
             </tr>
           <% end %>    
         <% end %>
