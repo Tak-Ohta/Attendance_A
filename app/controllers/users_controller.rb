@@ -47,10 +47,10 @@ class UsersController < ApplicationController
       # column_valuesに代入するカラム値を定義
       attendances.each do |attendance|
         values = [User.find_by(id: attendance.user_id).name, attendance.worked_on,
-          attendance.started_at.present? ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.finished_at.present? ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.re_change_started_at.present? ? attendance.re_change_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.re_change_finished_at.present? ? attendance.re_change_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil
+            attendance.started_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+            attendance.finished_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+            attendance.re_change_started_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.re_change_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+            attendance.re_change_finished_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.re_change_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil
         ]
         # 表の値を定義
         csv << values
