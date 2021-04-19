@@ -49,10 +49,14 @@ class AttendancesController < ApplicationController
     monthly_attendance_application_params.each do |id, item|
       attendance = Attendance.find(id)
       attendance.monthly_attendance_approval_result = nil
-      if attendance.update(item)
-        flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ1ヶ月分の勤怠を申請しました。"
+      if monthly_attendance_application_params[id][:select_superior_for_monthly_attendance].present?
+        if attendance.update(item)
+          flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ1ヶ月分の勤怠を申請しました。"
+        else
+          flash[:danger] = "1ヶ月分の勤怠申請に失敗しました。"
+        end
       else
-        flash[:danger] = "1ヶ月分の勤怠申請に失敗しました。"
+        flash[:danger] = "所属長を選択してください。"
       end
       redirect_to user_url(@user, date: attendance.worked_on.beginning_of_month)
     end
