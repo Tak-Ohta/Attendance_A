@@ -15,13 +15,13 @@ class UsersController < ApplicationController
     @worked_sum = @attendances.where.not(started_at: nil).count
     # 所属長承認申請のお知らせ（上長ごとに、1ヶ月分の勤怠申請がされている件数をカウント）
     if current_user.superior?
-      @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name).
-                                                  where(monthly_attendance_approval_result: [nil, '']).count
+      @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name)
+                                                  .where(monthly_attendance_approval_result: [nil, '']).count
     end
     # 勤怠変更申請のお知らせ
     if current_user.superior?
-      @attendances_change_application = Attendance.where(select_superior_for_attendance_change: current_user.name).
-                                                  where(confirm_superior_for_attendance_change: [nil, '']).count
+      @attendances_change_application = Attendance.where(select_superior_for_attendance_change: current_user.name)
+                                                  .where("instructor_for_attendances_change LIKE ?", "%申請中").count
     end
     
     # 残業申請のお知らせ（上長ごとに、残業申請がされている件数をカウント）

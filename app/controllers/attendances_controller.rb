@@ -8,7 +8,8 @@ class AttendancesController < ApplicationController
   before_action :admin_or_correct_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application,
                                   :edit_overtime_application, :update_overtime_application, :attendance_log]
-  before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval]
+  before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval, :edit_monthly_attendance_approval, :update_monthly_attendance_approval,
+                                      :edit_attendances_change_approval, :update_attendances_change_approval]
   before_action :set_one_month, only: [:edit_attendances_change_application, :edit_overtime_application, :attendance_log]
   before_action :superiors, only: [:edit_attendances_change_application, :edit_overtime_application]
   before_action :overtime_application, only: [:edit_overtime_application, :update_overtime_application]
@@ -131,6 +132,7 @@ class AttendancesController < ApplicationController
   # 勤怠変更申請承認
   def edit_attendances_change_approval
     @users = User.includes(:attendances).where(attendances: { select_superior_for_attendance_change: current_user.name })
+                                        .where("instructor_for_attendances_change LIKE ?", "%申請中")
   end
 
   def update_attendances_change_approval
@@ -143,7 +145,6 @@ class AttendancesController < ApplicationController
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "否認"
             attendance.instructor_for_attendances_change = "勤怠変更否認"
           end
-          attendance.select_superior_for_attendance_change = nil
           attendance.attendances_change_approval_day = Date.current
           attendance.update!(item)
         end
