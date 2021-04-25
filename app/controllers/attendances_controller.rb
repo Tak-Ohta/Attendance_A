@@ -147,6 +147,8 @@ class AttendancesController < ApplicationController
           end
           attendance.attendances_change_approval_day = Date.current
           attendance.update!(item)
+        else
+          flash[:danger] = "変更欄にチェックがありません。"
         end
       end
     end

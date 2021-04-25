@@ -12,14 +12,10 @@
       
       <tdody>
       <% @users.each do |user| %>
-        <% user.attendances.each do |attendance| %>
-          <% if (Date.current == attendance.worked_on) && attendance.started_at.present? && attendance.finished_at.nil? %>
-            <tr>
-              <td><%= user.uid %></td>
-              <td><%= user.name %></td>
-            </tr>
-          <% end %>
-        <% end %>
+        <tr>
+          <td><%= user.uid %></td>
+          <td><%= user.name %></td>
+        </tr>
       <% end %>
       </tdody>
     </table>

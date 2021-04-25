@@ -29,8 +29,8 @@
                     <%= f.fields_for "attendances[]", day do |attendance| %>
                       <tr>
                         <td><%= day.worked_on.month %>月</td>
-                        <td><%= attendance.select :confirm_superior_for_monthly_attendance,  [["申請中"], ["なし"], ["承認"], ["否認"]] %></td>
-                        <td><%= attendance.check_box :monthly_attendance_check_box, {}, true, false %></td>
+                        <td><%= attendance.select :confirm_superior_for_monthly_attendance,  [["---"], ["申請中"], ["なし"], ["承認"], ["否認"]] %></td>
+                        <td><%= attendance.check_box :monthly_attendance_check_box, {}, checked_value = "true",unchecked_value = "false" %></td>
                         <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
                       </tr>
                     <% end %>

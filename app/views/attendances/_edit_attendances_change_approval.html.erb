@@ -93,7 +93,7 @@
                         <!-- 指示者確認印 -->
                         <td><%= attendance.select :confirm_superior_for_attendance_change, [["ｰｰｰ"], ["承認"], ["否認"]] %></td>
                         <!-- 変更 -->
-                        <td><%= attendance.check_box :check_box_for_attendance_change, {}, true, false %></td>
+                        <td><%= attendance.check_box :check_box_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %></td>
                         <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
                       </tr>
                     <% end %>

@@ -1,8 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info]
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_overtime_application]
-  before_action :correct_user, only: [:edit, :update]
-  before_action :admin_user, only: [:index, :destroy]
+  before_action :admin_user, only: [:edit, :update, :index, :destroy, :at_work, :edit_basic_info, :update_basic_info]
   before_action :set_one_month, only: :show
   before_action :superiors, only: :show
 
@@ -87,7 +86,7 @@ class UsersController < ApplicationController
   def update
     if @user.update(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to @user
+      redirect_to users_url(current_user)
     else
       flash[:danger] = "ユーザー情報を更新できませんでした。"
       render :edit
@@ -100,9 +99,11 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  # 出勤社員一覧
   def at_work
-    @users = User.all.includes(:attendances)
-    
+    @users = User.all.includes(:attendances).where(attendances: { worked_on: Date.current })
+                                            .where.not(attendances: { started_at: nil })
+                                            .where(attendances: { finished_at: nil })
   end
 
   def edit_basic_info

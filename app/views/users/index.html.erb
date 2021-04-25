@@ -14,11 +14,13 @@
     <table class="table table-condensed" id="table-users">
       <% @users.each do |user| %>
         <tr>
-          <td><%= user.name %></td>
+          <% unless user.admin? %>
+            <td><%= user.name %></td>
+          <% end %>
         </tr>
         <tr>
           <td>
-            <% if !current_user?(user) %>
+            <% unless user.admin? %>
               <%= link_to "削除", user, method: :delete,
                   data: { confirm: "#{user.name}のデータを削除してよろしいですか？"},
                   class: "btn btn-primary" %>
@@ -26,24 +28,26 @@
           </td>
         </tr>
         <tr>
-          <div class="panel-group" id="accordion">
-            <td>
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <h4 class="panel-title">
-                    <button data-toggle="collapse" data-toggle="collapse" data-target="#collapse<%= user.id %>" class="btn btn-primary btn-lg">
-                      編集
-                    </button>
-                  </h4>
-                </div>
-                <div id="collapse<%= user.id %>" class="panel-collapse collapse">
-                  <div class="panel-body">
-                    <%= render 'form', locals: {user: @user = User.find_by(id: user.id) } %>
+          <% unless user.admin? %>
+            <div class="panel-group" id="accordion">
+              <td>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <button data-toggle="collapse" data-toggle="collapse" data-target="#collapse<%= user.id %>" class="btn btn-primary btn-lg">
+                        編集
+                      </button>
+                    </h4>
+                  </div>
+                  <div id="collapse<%= user.id %>" class="panel-collapse collapse">
+                    <div class="panel-body">
+                      <%= render 'form', locals: {user: @user = User.find_by(id: user.id) } %>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </td>
-          </div>
+              </td>
+            </div>
+          <% end %>
         </tr>
       <% end %>
     </table>

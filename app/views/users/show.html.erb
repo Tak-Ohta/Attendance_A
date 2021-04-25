@@ -212,7 +212,7 @@
                       <%= day.monthly_attendance_approval_result %>
                     <% end %>
                   </span></br>
-                  <%= attendance.collection_select :select_superior_for_monthly_attendance, @superiors, :name, :name, {prompt: ""}, class: "form-control" %>
+                  <%= attendance.collection_select :select_superior_for_monthly_attendance, @superiors, :name, :name, {include_blank: true}, class: "form-control" %>
               <% end %>
               <%= f.submit "申請", class: "btn btn-primary btn-sm btn-block", id: "btn-monthly-attendance-application" %>
             <% end %>
