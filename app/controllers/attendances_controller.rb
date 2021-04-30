@@ -168,11 +168,15 @@ class AttendancesController < ApplicationController
   def update_overtime_application
     overtime_application_params.each do |id, item|
       attendance = Attendance.find(id)
-      attendance.instructor = "#{overtime_application_params[id][:select_superior_for_overtime]}へ残業申請中"
-      if attendance.update(item)
-        flash[:success] = "残業申請が完了しました。"
+      if overtime_application_params[id][:scheduled_end_time].blank? || overtime_application_params[id][:work_contents].blank? || overtime_application_params[id][:select_superior_for_overtime].blank?
+        flash[:danger] = "終了予定時間、業務内容、または、指示者確認欄がありません。"
       else
-        flash[:danger] = "残業申請に失敗しました。無効な入力、もしくは、未入力がないか確認してください。"
+        attendance.instructor = "#{overtime_application_params[id][:select_superior_for_overtime]}へ残業申請中"
+        if attendance.update(item)
+          flash[:success] = "#{attendance.select_superior_for_overtime}への残業申請が完了しました。"
+        else
+          flash[:danger] = "残業申請に失敗しました。無効な入力、もしくは、未入力がないか確認してください。"
+        end
       end
       redirect_to user_url(@user, date: attendance.worked_on.beginning_of_month)
     end
@@ -195,16 +199,22 @@ class AttendancesController < ApplicationController
           attendance.instructor = "残業否認"
           attendance.select_superior_for_overtime = nil
         elsif overtime_approval_params[id][:confirm_superior_for_overtime] == "なし"
+          attendance.scheduled_end_time = nil
+          attendance.next_day_for_overtime = nil
+          attendance.work_contents = nil
           attendance.instructor = "残業なし"
           attendance.select_superior_for_overtime = nil
         else overtime_approval_params[id][:confirm_superior_for_overtime] == "申請中"
           attendance.instructor = "残業申請中"
         end
         if attendance.update(item)
-          flash[:success] = "#{user.name}の残業申請の変更を送信しました。"
+          flash[:success] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「承認」しました。" if attendance.confirm_superior_for_overtime == "承認"
+          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「否認」しました。" if attendance.confirm_superior_for_overtime == "否認"
+          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「なし」にしました。" if attendance.confirm_superior_for_overtime == "なし"
+          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「申請中」にしました。" if attendance.confirm_superior_for_overtime == "申請中"
         end
       else
-        flash[:danger] = "「変更」欄にチェックがありません。#{user.name}の変更を反映できませんでした。"
+        flash[:danger] = "「変更」欄にチェックがありません。#{user.name}の#{l(attendance.worked_on, format: :short)}分の変更を反映できませんでした。"
       end
     end
       redirect_to user_url(current_user)

@@ -152,20 +152,17 @@
           <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
         </td>
         <td><%= day.note %></td>
-        <!-- 終了予定時間 -->
+        <!-- 終了予定時間（時） -->
         <td>
-          <% if day.confirm_superior_for_overtime == "承認" %>
-            <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%H") if day.scheduled_end_time.present? %>
-          <% end %>
+          <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%H") if day.scheduled_end_time.present? %>
         </td>
+        <!-- 終了予定時間（分） -->
         <td>
-          <% if day.confirm_superior_for_overtime == "承認" %>
-            <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%M") if day.scheduled_end_time.present? %>
-          <% end %> 
+          <%= day.scheduled_end_time.floor_to(15.minutes).strftime("%M") if day.scheduled_end_time.present? %>
         </td>
         <!-- 時間外時間 -->
         <td>
-          <% if day.scheduled_end_time.present? && day.confirm_superior_for_overtime == "承認" %>
+          <% if day.scheduled_end_time.present? %>
             <% designated_work_end_time = date_correction(day.worked_on, @user.designated_work_end_time) %>
             <% scheduled_end_time = date_correction(day.worked_on, day.scheduled_end_time.floor_to(15.minutes)) %>
             <% if day.next_day_for_overtime == true %>
@@ -177,7 +174,7 @@
           <% end %>
         </td>
         <!-- 業務処理内容 -->
-        <td><%= day.work_contents if day.work_contents.present? && day.confirm_superior_for_overtime == "承認" %></td>
+        <td><%= day.work_contents if day.work_contents.present? %></td>
         <!-- 指示者確認印 -->
         <td>
           <%= day.instructor if day.instructor.present? %></br>
@@ -193,8 +190,6 @@
         <td colspan="6"></td>
         <td><%= format("%.2f", @total_working_time.to_f) %></td>
         <td colspan="3"></td>
-        <!-- 時間外時間合計 -->
-        <td><%= format("%.2f", @total_overtime.to_f) %></td>
         <td></td>
         <!-- 1ヶ月分の勤怠を申請する -->
         <td>
