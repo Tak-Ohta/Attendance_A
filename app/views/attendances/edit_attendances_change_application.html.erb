@@ -23,12 +23,43 @@
             <tr>
               <td><%= l(day.worked_on, format: :short) %></td>
               <td><%= $days_of_the_week[day.worked_on.wday] %></td>
-              <td><%= attendance.time_field :re_change_started_at, class: "form-control" %></td>
-              <td><%= attendance.time_field :re_change_finished_at, class: "form-control" %></td>
-              <td><%= attendance.check_box :next_day_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %></td>
+              <!-- 出社時間 -->
+              <td>
+                <% if day.worked_on > Date.current %>
+                  <%= attendance.time_field :re_change_started_at, readonly: true, class: "form-control" %>
+                <% else %>
+                  <%= attendance.time_field :re_change_started_at, class: "form-control" %>
+                <% end %>
+              </td>
+              <!-- 退社時間 -->
+              <td>
+                <% if day.worked_on > Date.current %>
+                  <%= attendance.time_field :re_change_finished_at, readonly: true, class: "form-control" %>
+                <% else %>
+                  <%= attendance.time_field :re_change_finished_at, class: "form-control" %>
+                <% end %>
+              </td>
+              <!-- 翌日チェック -->
+              <td>
+                <% unless day.worked_on > Date.current %>
+                  <%= attendance.check_box :next_day_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %>
+                <% end %>
+              </td>
               <td></td>
-              <td><%= attendance.text_field :note, class: "form-control" %></td>
-              <td><%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {include_blank: true}, {class: "form-control"} %></td>
+              <!-- 備考 -->
+              <td>
+                <% if day.worked_on > Date.current %>
+                  <%= attendance.text_field :note, readonly: true, class: "form-control" %>
+                <% else %>
+                  <%= attendance.text_field :note, class: "form-control" %>
+                <% end %>
+              </td>
+              <!-- 指示者確認印 -->
+              <td>
+                <% unless day.worked_on > Date.current %>
+                  <%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {include_blank: true}, {class: "form-control"} %>
+                <% end %>
+              </td>
             </tr>
           <% end %>    
         <% end %>
