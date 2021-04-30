@@ -107,13 +107,8 @@
         <td><%= l(day.worked_on, format: :short) %></td>
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
         <!-- 出社時間 -->
-        <% if day.re_change_started_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
-          <td><%= day.re_change_started_at.floor_to(15.minutes).strftime("%H") if day.re_change_started_at.present? %></td>
-          <td><%= day.re_change_started_at.floor_to(15.minutes).strftime("%M") if day.re_change_started_at.present? %></td>
-        <% else %>
           <td><%= day.started_at.floor_to(15.minutes).strftime("%H") if day.started_at.present? %></td>
           <td><%= day.started_at.floor_to(15.minutes).strftime("%M") if day.started_at.present?  %></td>
-        <% end %>
         <!-- 出勤ボタン -->
         <td>
           <% if current_user?(@user) || current_user.admin? %>
@@ -123,13 +118,8 @@
           <% end %>
         </td>
         <!-- 退社時間 -->
-        <% if day.re_change_finished_at.present? && (day.instructor_for_attendances_change == "勤怠変更承認済") %>
-          <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%H") if day.re_change_finished_at.present? %></td>
-          <td><%= day.re_change_finished_at.floor_to(15.minutes).strftime("%M") if day.re_change_finished_at.present? %></td>
-        <% else %>
           <td><%= day.finished_at.floor_to(15.minutes).strftime("%H") if day.finished_at.present? %></td>
           <td><%= day.finished_at.floor_to(15.minutes).strftime("%M") if day.finished_at.present? %></td>
-        <% end %>
         <!-- 退勤ボタン -->
         <td>
           <% if current_user?(@user) || current_user.admin? %>
@@ -140,16 +130,14 @@
         </td>
         <!-- 在社時間 -->
         <td>
-          <% if day.re_change_started_at.present? && day.re_change_finished_at.present? && day.instructor_for_attendances_change == "勤怠変更承認済" %>
+          <% if day.started_at.present? && day.finished_at.present? %>
             <% if day.next_day_for_attendance_change == true %>
-              <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.tomorrow.floor_to(15.minutes)) %>
+              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
             <% else %>
-              <%= str_time = working_time(day.re_change_started_at.floor_to(15.minutes), day.re_change_finished_at.floor_to(15.minutes)) %>
+              <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
             <% end %>
-          <% elsif day.started_at.present? && day.finished_at.present? %>
-            <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-          <% end %>
           <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
+          <% end %>
         </td>
         <td><%= day.note %></td>
         <!-- 終了予定時間（時） -->

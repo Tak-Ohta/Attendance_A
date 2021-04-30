@@ -5,9 +5,11 @@ class Attendance < ApplicationRecord
   validates :note, length: { maximum: 50}
   validate :finished_at_is_invalid_without_started_at
   validate :finished_at_earlier_than_started_at_is_invalid
-  validate :only_re_change_started_at_is_invalid
-  validate :only_re_change_finished_at_is_invalid
-  validate :re_change_finished_at_earlier_than_re_change_started_at_is_invalid
+  validate :only_started_at_is_invalid
+  validate :only_finished_at_is_invalid
+  validate :finished_at_earlier_than_started_at_is_invalid
+  validate :only_select_instructor_is_invalid
+  validate :invalid_if_no_instructor_is_selected
 
   # 出勤時間の登録がない退勤時間の登録は無効
   def finished_at_is_invalid_without_started_at
@@ -22,27 +24,42 @@ class Attendance < ApplicationRecord
   end
 
   # 変更後出勤時間のみの登録は無効
-  def only_re_change_started_at_is_invalid
-    if select_superior_for_attendance_change.present? && re_change_started_at.present? && re_change_finished_at.blank?
-      errors.add(:re_change_finished_at, "退社時間が必要です。")
+  def only_started_at_is_invalid
+    if select_superior_for_attendance_change.present? && started_at.present? && finished_at.blank?
+      errors.add(:finished_at, "退社時間が必要です。")
     end
   end
 
   # 変更後退勤時間のみの登録は無効
-  def only_re_change_finished_at_is_invalid
-    if select_superior_for_attendance_change.present? && re_change_finished_at.present? && re_change_started_at.blank?
-      errors.add(:re_change_started_at, "出社時間が必要です。")
+  def only_finished_at_is_invalid
+    if select_superior_for_attendance_change.present? && finished_at.present? && started_at.blank?
+      errors.add(:started_at, "出社時間が必要です。")
     end
   end
 
   # 出勤時間より早い退勤時間の登録は無効
-  def re_change_finished_at_earlier_than_re_change_started_at_is_invalid
-    if re_change_started_at.present? && re_change_finished_at.present? && select_superior_for_attendance_change.present?
+  def finished_at_earlier_than_started_at_is_invalid
+    if started_at.present? && finished_at.present? && select_superior_for_attendance_change.present?
       if next_day_for_attendance_change == true
-        errors.add(:re_change_started_at, "より早い退社時間は無効です。") if re_change_started_at.to_time > re_change_finished_at.to_time.tomorrow
+        errors.add(:started_at, "より早い退社時間は無効です。") if started_at.to_time > finished_at.to_time.tomorrow
       else
-        errors.add(:re_change_started_at, "より早い退社時間は無効です。") if re_change_started_at > re_change_finished_at
+        errors.add(:started_at, "より早い退社時間は無効です。") if started_at > finished_at
       end
     end
   end
+
+  # 勤怠変更申請で指示者のみ選択されていて、変更時間がない場合は無効
+  def only_select_instructor_is_invalid
+    if started_at.blank? && finished_at.blank? && select_superior_for_attendance_change.present?
+      errors.add(:started_at, "が必要です。")
+    end
+  end
+
+  # 変更時間のみで、指示者が選択されていない場合は無効
+  def invalid_if_no_instructor_is_selected
+    if started_at.present? && finished_at.present? && select_superior_for_attendance_change.blank?
+      errors.add(:select_superior_for_attendance_change, "が必要です。")
+    end
+  end
+
 end

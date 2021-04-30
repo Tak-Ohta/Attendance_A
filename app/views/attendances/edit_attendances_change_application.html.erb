@@ -26,17 +26,17 @@
               <!-- 出社時間 -->
               <td>
                 <% if day.worked_on > Date.current %>
-                  <%= attendance.time_field :re_change_started_at, readonly: true, class: "form-control" %>
+                  <%= attendance.time_field :started_at, readonly: true, class: "form-control" %>
                 <% else %>
-                  <%= attendance.time_field :re_change_started_at, class: "form-control" %>
+                  <%= attendance.time_field :started_at, class: "form-control" %>
                 <% end %>
               </td>
               <!-- 退社時間 -->
               <td>
                 <% if day.worked_on > Date.current %>
-                  <%= attendance.time_field :re_change_finished_at, readonly: true, class: "form-control" %>
+                  <%= attendance.time_field :finished_at, readonly: true, class: "form-control" %>
                 <% else %>
-                  <%= attendance.time_field :re_change_finished_at, class: "form-control" %>
+                  <%= attendance.time_field :finished_at, class: "form-control" %>
                 <% end %>
               </td>
               <!-- 翌日チェック -->

@@ -27,13 +27,13 @@ class AttendancesController < ApplicationController
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
     if @attendance.started_at.nil?
-      if @attendance.update(started_at: Time.current.change(sec: 0))
+      if @attendance.update(started_at: Time.current.change(sec: 0)) && @attendance.update(change_before_started_at: Time.current.change(sec: 0))
         flash[:success] = "おはようございます。出勤時間を登録しました。"
       else
         flash[:danger] = UPDATE_ERROR_MSG
       end
     elsif @attendance.started_at.present? && @attendance.finished_at.nil?
-      if @attendance.update(finished_at: Time.current.change(sec: 0))
+      if @attendance.update(finished_at: Time.current.change(sec: 0)) && @attendance.update(change_before_finished_at: Time.current.change(sec: 0))
         flash[:success] = "お疲れ様でした。退勤時間を登録しました。"
       else
        flash[:danger] = UPDATE_ERROR_MSG  
@@ -104,25 +104,27 @@ class AttendancesController < ApplicationController
       attendances_change_application_params.each do |id, item|
         attendance = Attendance.find(id)
         if attendances_change_application_params[id][:select_superior_for_attendance_change].present?
-          if attendances_change_application_params[id][:re_change_started_at].present? && attendances_change_application_params[id][:re_change_finished_at].present?
-            if attendance.started_at.blank?
-              attendance.started_at = attendances_change_application_params[id][:re_change_started_at]
+          if attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].present?
+            if attendance.change_before_started_at.blank?
+              attendance.change_before_started_at = attendances_change_application_params[id][:started_at]
             end
-            if attendance.finished_at.blank?
+            if attendance.change_before_finished_at.blank?
               if attendances_change_application_params[id][:next_day_for_attendance_change] == "true"
-                attendance.finished_at = attendances_change_application_params[id][:re_change_finished_at].to_time.tomorrow
+                attendance.change_before_finished_at = attendances_change_application_params[id][:finished_at].to_time.tomorrow
               else
-                attendance.finished_at = attendances_change_application_params[id][:re_change_finished_at]
+                attendance.change_before_finished_at = attendances_change_application_params[id][:finished_at]
               end
             end
           end
           attendance.confirm_superior_for_attendance_change = nil
           attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
-          attendance.update!(item)
-        end 
+        else attendances_change_application_params[id][:started_at].present? || attendances_change_application_params[id][:finished_at].present?
+          raise
+        end
+        attendance.update!(item)
+        flash[:success] = "勤怠の変更申請を送信しました。"
       end
     end
-    flash[:success] = "勤怠の変更申請を送信しました。"
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid
     flash[:danger] = "無効な入力データがあったため、更新をキャンセルしました。"
@@ -242,7 +244,7 @@ class AttendancesController < ApplicationController
     end
 
     def attendances_change_application_params
-      params.require(:user).permit(attendances: [:re_change_started_at, :re_change_finished_at, :next_day_for_attendance_change, :note, :select_superior_for_attendance_change])[:attendances]
+      params.require(:user).permit(attendances: [:started_at, :finished_at, :next_day_for_attendance_change, :note, :select_superior_for_attendance_change])[:attendances]
     end
 
     def attendances_change_approval_params
