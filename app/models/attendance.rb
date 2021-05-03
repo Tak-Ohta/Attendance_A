@@ -9,7 +9,6 @@ class Attendance < ApplicationRecord
   validate :only_finished_at_is_invalid
   validate :finished_at_earlier_than_started_at_is_invalid
   validate :only_select_instructor_is_invalid
-  validate :invalid_if_no_instructor_is_selected
 
   # 出勤時間の登録がない退勤時間の登録は無効
   def finished_at_is_invalid_without_started_at
@@ -54,12 +53,4 @@ class Attendance < ApplicationRecord
       errors.add(:started_at, "が必要です。")
     end
   end
-
-  # 変更時間のみで、指示者が選択されていない場合は無効
-  def invalid_if_no_instructor_is_selected
-    if started_at.present? && finished_at.present? && select_superior_for_attendance_change.blank?
-      errors.add(:select_superior_for_attendance_change, "が必要です。")
-    end
-  end
-
 end

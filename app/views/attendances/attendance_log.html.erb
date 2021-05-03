@@ -35,7 +35,7 @@
             <td><%= attendance.change_before_finished_at.floor_to(15.minutes).strftime("%R") if attendance.change_before_finished_at.present? %></td>
             <td><%= attendance.started_at.floor_to(15.minutes).strftime("%R") if attendance.started_at.present? %></td>
             <td><%= attendance.finished_at.floor_to(15.minutes).strftime("%R") if attendance.finished_at.present? %></td>
-            <td><%= attendance.select_superior_for_attendance_change %></td>
+            <td><%= attendance.instructor_of_attendances_log %></td>
             <td><%= attendance.attendances_change_approval_day.strftime("%F") %></td>
           </tr>
         <% end %>

@@ -65,10 +65,10 @@
                         <!-- 備考 -->
                         <td><%= day.note %></td>
                         <!-- 指示者確認印 -->
-                        <td><%= attendance.select :confirm_superior_for_attendance_change, [["ｰｰｰ"], ["承認"], ["否認"]] %></td>
+                        <td><%= attendance.select :confirm_superior_for_attendance_change, [["なし"], ["申請中"], ["承認"], ["否認"]], {include_blank: true} %></td>
                         <!-- 変更 -->
                         <td><%= attendance.check_box :check_box_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %></td>
-                        <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), class: "btn btn-primary btn-sm" %></td>
+                        <td><%= link_to "確認", user_path(user, date: day.worked_on.beginning_of_month), target: :_blank, rel: "noopener noreferrer", class: "btn btn-primary btn-sm" %></td>
                       </tr>
                     <% end %>
                   <% end %>
