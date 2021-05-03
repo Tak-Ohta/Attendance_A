@@ -1,7 +1,9 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info]
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_overtime_application]
-  before_action :admin_user, only: [:edit, :update, :index, :destroy, :at_work, :edit_basic_info]
+  before_action :admin_user, only: [:index, :destroy, :at_work, :edit_basic_info]
+  before_action :admin_or_correct_user, only: [:edit, :update]
+  before_action :admin_or_correct_user_or_superior, only: :show
   before_action :set_one_month, only: :show
   before_action :superiors, only: :show
 
@@ -28,11 +30,13 @@ class UsersController < ApplicationController
       @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
     end
 
+    # 申請中を除くcsv出力用データ
+    @csv_outputs = @attendances.where.not("instructor_for_attendances_change LIKE ?", "%申請中")
     # csv出力
     respond_to do |format|
       format.html
       format.csv do |csv|
-        send_attendances_csv(@attendances)
+        send_attendances_csv(@csv_outputs)
       end
     end
   end
@@ -40,22 +44,23 @@ class UsersController < ApplicationController
   # 勤怠csv出力
   def send_attendances_csv(attendances)
     csv_data = CSV.generate(headers: true) do |csv|
-      header = ["名前", "日付", "出社時間", "退社時間", "変更後出社時間", "変更後退社時間"]
+      header = ["日付", "出社時間", "退社時間", "変更後出社時間", "変更後退社時間", "指示者確認 &#12958;"]
       # 表のカラム名を定義
       csv << header
       # column_valuesに代入するカラム値を定義
       attendances.each do |attendance|
-        values = [User.find_by(id: attendance.user_id).name, attendance.worked_on,
-            attendance.started_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-            attendance.finished_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-            attendance.started_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-            attendance.finished_at.present? && !attendance.instructor_for_attendances_change.include?("申請中") ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil
-        ]
+        values = [attendance.worked_on,
+          attendance.change_before_started_at.present? ? attendance.change_before_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.started_at.present? ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.finished_at.present? ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          attendance.instructor_for_attendances_change
+          ]
         # 表の値を定義
         csv << values
       end
     end
-    send_data(csv_data, filename: "attendances-#{Time.zone.now.strftime('%Y%m%d%S')}.csv")
+    send_data(csv_data, filename: "勤怠情報-#{User.find(params[:id]).name}-#{Time.zone.now.strftime('%Y%m%d%S')}.csv")
   end
 
   def create
@@ -86,7 +91,7 @@ class UsersController < ApplicationController
   def update
     if @user.update(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to users_url(current_user)
+      redirect_to user_url(current_user)
     else
       flash[:danger] = "ユーザー情報を更新できませんでした。"
       render :edit

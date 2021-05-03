@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
     @user = User.find(params[:id])
   end
 
+  # ログインユーザー
   def logged_in_user
     unless logged_in?
       store_location
@@ -16,12 +17,32 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # ログインユーザーとログイン先のユーザーが一致しているか？
   def correct_user
     redirect_to root_url unless current_user?(@user)
   end
 
+  # 管理者ユーザーか？
   def admin_user
     redirect_to root_url unless current_user.admin?
+  end
+
+  # 管理者ユーザーかログインユーザーとログイン先が一致しているか？
+  def admin_or_correct_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.admin?
+      flash[:danger] = "参照・編集権限がありません。"
+      redirect_to root_url
+    end
+  end
+
+  # 管理者ユーザーかログインユーザーか上長か？
+  def admin_or_correct_user_or_superior
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.admin? || @user.superior?
+      flash[:danger] = "参照・編集権限がありません。"
+      redirect_to root_url
+    end
   end
 
   def superior_user

@@ -279,15 +279,6 @@ class AttendancesController < ApplicationController
       params.require(:user).permit(attendances: [:user_id, :confirm_superior_for_overtime, :approval_check_box])[:attendances]
     end
 
-
-    def admin_or_correct_user
-      @user = User.find(params[:user_id]) if @user.blank?
-      unless current_user?(@user) || current_user.admin?
-        flash[:danger] = "参照・編集権限がありません。"
-        redirect_to root_url
-      end
-    end
-
     def overtime_application
       @attendance = @user.attendances.find_by(worked_on: params[:date])
     end
