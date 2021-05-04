@@ -2,8 +2,9 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info]
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_overtime_application]
   before_action :admin_user, only: [:index, :destroy, :at_work, :edit_basic_info]
-  before_action :admin_or_correct_user, only: [:edit, :update]
-  before_action :admin_or_correct_user_or_superior, only: :show
+  before_action :admin_user_is_impossible, only: [:show, :edit]
+  before_action :correct_user, only: [:edit, :update]
+  before_action :correct_user_or_superior, only: :show
   before_action :set_one_month, only: :show
   before_action :superiors, only: :show
 
@@ -80,8 +81,11 @@ class UsersController < ApplicationController
   end
 
   def import
-    User.import(params[:file])
-    flash[:success] = "ユーザーを追加しました。"
+    if User.import(params[:file])
+      flash[:success] = "ユーザー情報のインポートに成功しました。"
+    else
+      flash[:danger] = "ユーザー情報のインポートに失敗しました。"
+    end
     redirect_to users_url
   end
 

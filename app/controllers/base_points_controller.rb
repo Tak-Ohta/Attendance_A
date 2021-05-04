@@ -16,7 +16,7 @@ class BasePointsController < ApplicationController
       flash[:success] = "拠点情報を新規登録しました。"
       redirect_to base_points_url
     else
-      flash.now[:danger] = "拠点情報の登録に失敗しました。入力漏れがないか確認してください。"
+      flash.now[:danger] = "拠点情報の登録に失敗しました。入力漏れ、重複がないか確認してください。"
       render :new
     end
   end
@@ -31,7 +31,7 @@ class BasePointsController < ApplicationController
       flash[:success] = "拠点情報を更新しました。"
       redirect_to base_points_url
     else
-      flash.now[:danger] = "拠点情報の更新に失敗しました。入力漏れがないか確認してください。"
+      flash.now[:danger] = "拠点情報の更新に失敗しました。入力漏れ、重複がないか確認してください。"
       render :edit
     end
   end

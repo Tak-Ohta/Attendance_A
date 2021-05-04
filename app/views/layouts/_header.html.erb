@@ -4,7 +4,11 @@
     <nav>
       <ul class="nav navbar-nav navbar-right">
         <% if logged_in? %>
-          <li><%= link_to "トップへ", current_user %></li>
+          <% if current_user.admin? %>
+            <li><%= link_to "トップへ", root_path %></li>
+          <% else %>
+            <li><%= link_to "トップへ", current_user %></li>
+          <% end %>
           <% if current_user.admin? %>
             <li><%= link_to "ユーザー一覧", users_path %></li>
             <li><%= link_to "出勤社員一覧", at_work_users_path %></li>

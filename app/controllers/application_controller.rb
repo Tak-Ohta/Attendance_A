@@ -22,24 +22,35 @@ class ApplicationController < ActionController::Base
     redirect_to root_url unless current_user?(@user)
   end
 
-  # 管理者ユーザーか？
+  # 管理者ユーザーのみ
   def admin_user
-    redirect_to root_url unless current_user.admin?
-  end
-
-  # 管理者ユーザーかログインユーザーとログイン先が一致しているか？
-  def admin_or_correct_user
-    @user = User.find(params[:user_id]) if @user.blank?
-    unless current_user?(@user) || current_user.admin?
+    unless current_user.admin?
       flash[:danger] = "参照・編集権限がありません。"
       redirect_to root_url
     end
   end
 
-  # 管理者ユーザーかログインユーザーか上長か？
-  def admin_or_correct_user_or_superior
+  # 管理者ユーザーは勤怠表示・編集は不可
+  def admin_user_is_impossible
+    if current_user.admin?
+      flash[:danger] = "参照・編集権限がありません。"
+      redirect_to users_url
+    end
+  end
+
+  # ログインユーザーとログイン先が一致しているか？
+  def correct_user
     @user = User.find(params[:user_id]) if @user.blank?
-    unless current_user?(@user) || current_user.admin? || @user.superior?
+    unless current_user?(@user)
+      flash[:danger] = "参照・編集権限がありません。"
+      redirect_to root_url
+    end
+  end
+
+  # ログインユーザーか上長か？
+  def correct_user_or_superior
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || @user.superior?
       flash[:danger] = "参照・編集権限がありません。"
       redirect_to root_url
     end

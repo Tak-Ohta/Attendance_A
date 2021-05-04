@@ -48,8 +48,13 @@ module SessionsHelper
 
   # 記憶しているURL（またはデフォルトURL）にレダイレクトする。
   def redirect_back_or(default_url)
-    redirect_to(session[:forwarding_url] || default_url)
-    session.delete(:forwarding_url)
+    if current_user.admin?
+      redirect_to users_url
+      session.delete(:forwarding_url)
+    else
+      redirect_to(session[:forwarding_url] || default_url)
+      session.delete(:forwarding_url)
+    end
   end
 
   # アクセルしようとしたURLを記憶する
