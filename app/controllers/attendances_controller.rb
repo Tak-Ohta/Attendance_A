@@ -163,17 +163,13 @@ class AttendancesController < ApplicationController
           end
           attendance.attendances_change_approval_day = Date.current
           if attendance.update!(item)
-            flash[:success] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の勤怠変更を「承認」しました。" if attendance.confirm_superior_for_attendance_change == "承認"
-            flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の勤怠変更を「否認」しました。" if attendance.confirm_superior_for_attendance_change == "否認"
-            flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の勤怠変更を「申請中」にしました。" if attendance.confirm_superior_for_attendance_change == "申請中"
-            flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の勤怠変更を「なし」にしました。" if attendance.confirm_superior_for_attendance_change == "なし"
+            flash[:success] = "勤怠変更申請の結果を送信しました。"
           end
         else
-          flash[:danger] = "変更欄にチェックがありません。"
+          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の変更欄にチェックがありません。"
         end
       end
     end
-    flash[:success] = "勤怠変更申請の結果を送信しました。"
     redirect_to user_url(current_user)
   rescue ActiveRecord::RecordInvalid
     flash[:danger] = "勤怠変更申請の送信に失敗しました。"
