@@ -59,9 +59,9 @@ ActiveRecord::Schema.define(version: 20210503073620) do
     t.integer "employee_number"
     t.string "uid"
     t.string "password_digest"
-    t.datetime "basic_work_time", default: "2021-04-30 23:00:00"
-    t.datetime "designated_work_start_time", default: "2021-05-01 00:00:00"
-    t.datetime "designated_work_end_time", default: "2021-05-01 08:00:00"
+    t.datetime "basic_work_time", default: "2021-05-03 23:00:00"
+    t.datetime "designated_work_start_time", default: "2021-05-04 00:00:00"
+    t.datetime "designated_work_end_time", default: "2021-05-04 09:00:00"
     t.boolean "superior"
     t.boolean "admin"
     t.datetime "created_at", null: false
