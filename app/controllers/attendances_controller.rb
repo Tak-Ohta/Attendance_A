@@ -237,7 +237,7 @@ class AttendancesController < ApplicationController
       @search_result = params[:attendance]
       date = Date.new @search_result["worked_on(1i)"].to_i, @search_result["worked_on(2i)"].to_i, @search_result["worked_on(3i)"].to_i
       search_date = date.strftime('%Y-%m')
-    
+
       @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" })
                                       .where( "worked_on LIKE ?", "#{search_date}%" )
     end
@@ -271,4 +271,5 @@ class AttendancesController < ApplicationController
     def overtime_application
       @attendance = @user.attendances.find_by(worked_on: params[:date])
     end
+
 end
