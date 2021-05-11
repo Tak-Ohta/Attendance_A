@@ -5,6 +5,7 @@ class AttendancesController < ApplicationController
                                   :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :logged_in_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :edit_overtime_application, :update_overtime_application, :attendance_log]
+  before_action :admin_user, only: :index
   before_action :correct_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application, :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval, :edit_monthly_attendance_approval, :update_monthly_attendance_approval,

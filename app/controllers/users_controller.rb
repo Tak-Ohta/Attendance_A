@@ -2,8 +2,8 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info]
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_overtime_application]
   before_action :admin_user, only: [:index, :destroy, :at_work, :edit_basic_info]
-  before_action :admin_user_is_impossible, only: [:show, :edit]
-  before_action :correct_user, only: [:edit, :update]
+  before_action :admin_or_correct_user, only: [:edit, :update]
+  before_action :admin_impossible, only: :show
   before_action :correct_user_or_superior, only: :show
   before_action :set_one_month, only: :show
   before_action :superiors, only: :show
@@ -110,7 +110,7 @@ class UsersController < ApplicationController
   def update
     if @user.update(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to user_url(current_user)
+      redirect_to users_url(current_user)
     else
       flash[:danger] = "ユーザー情報を更新できませんでした。"
       render :edit

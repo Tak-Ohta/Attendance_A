@@ -30,8 +30,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # 管理者ユーザーは勤怠表示・編集は不可
-  def admin_user_is_impossible
+  # ログインユーザーまたは管理者
+  def admin_or_correct_user
+    unless current_user?(@user) || current_user.admin?
+      flash[:danger] = "参照・編集権限がありません。"
+      redirect_to users_url
+    end
+  end
+
+  # 管理者は勤怠画面の表示と編集は不可
+  def admin_impossible
     if current_user.admin?
       flash[:danger] = "参照・編集権限がありません。"
       redirect_to users_url
