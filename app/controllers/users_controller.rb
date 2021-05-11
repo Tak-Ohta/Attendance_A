@@ -32,31 +32,46 @@ class UsersController < ApplicationController
     end
 
     # 申請中を除くcsv出力用データ
-    @csv_outputs = @attendances.where.not("instructor_for_attendances_change LIKE ?", "%申請中")
+    csv_attendances = @user.attendances.where(instructor_for_attendances_change: nil)
+                      .or(@user.attendances.where.not("instructor_for_attendances_change LIKE ?", "%申請中"))
+                      .order(:worked_on)
     # csv出力
     respond_to do |format|
       format.html
       format.csv do |csv|
-        send_attendances_csv(@csv_outputs)
+        send_attendances_csv(csv_attendances)
       end
     end
   end
 
   # 勤怠csv出力
-  def send_attendances_csv(attendances)
+  def send_attendances_csv(csv_attendances)
     csv_data = CSV.generate(headers: true) do |csv|
-      header = ["日付", "出社時間", "退社時間", "変更後出社時間", "変更後退社時間", "指示者確認 &#12958;"]
+      header = ["日付", "出社時間", "退社時間", "変更後出社時間", "変更後退社時間", "指示者確認"]
       # 表のカラム名を定義
       csv << header
       # column_valuesに代入するカラム値を定義
-      attendances.each do |attendance|
+      csv_attendances.each do |attendance|
+        
         values = [attendance.worked_on,
           attendance.change_before_started_at.present? ? attendance.change_before_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
           attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.started_at.present? ? attendance.started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.finished_at.present? ? attendance.finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          attendance.instructor_for_attendances_change
-          ]
+          if attendance.change_before_started_at.present? && attendance.started_at.present? && attendance.change_before_started_at == attendance.started_at && (attendance.instructor_for_attendances_change != "勤怠変更承認済")
+            nil
+          elsif attendance.started_at.present?
+            attendance.started_at.floor_to(15.minutes).strftime("%H:%M")
+          else
+            nil
+          end,
+          if attendance.change_before_finished_at.present? && attendance.finished_at.present? && attendance.change_before_finished_at == attendance.finished_at && (attendance.instructor_for_attendances_change != "勤怠変更承認済")
+            nil
+          elsif attendance.finished_at.present?
+            attendance.finished_at.floor_to(15.minutes).strftime("%H:%M")
+          else
+            nil
+          end,
+          attendance.instructor_for_attendances_change.present? ? attendance.instructor_for_attendances_change : nil
+        ]
         # 表の値を定義
         csv << values
       end
