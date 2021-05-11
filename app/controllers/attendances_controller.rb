@@ -102,7 +102,8 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do
       attendances_change_application_params.each do |id, item|
         attendance = Attendance.find(id)
-        if attendances_change_application_params[id][:select_superior_for_attendance_change].present?
+        if attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
+        else
           if attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].present?
             if attendance.change_before_started_at.blank?
               attendance.change_before_started_at = attendances_change_application_params[id][:started_at]
@@ -120,10 +121,6 @@ class AttendancesController < ApplicationController
           attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
           attendance.update!(item)
           flash[:success] = "勤怠の変更申請を送信しました。"
-        else
-          if (attendances_change_application_params[id][:started_at].present? || attendances_change_application_params[id][:finished_at].present?) && attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
-            flash[:danger] = "指示者が選択されていません。"
-          end
         end
       end
     end
@@ -165,8 +162,6 @@ class AttendancesController < ApplicationController
           if attendance.update!(item)
             flash[:success] = "勤怠変更申請の結果を送信しました。"
           end
-        else
-          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の変更欄にチェックがありません。"
         end
       end
     end

@@ -49,8 +49,8 @@ class ApplicationController < ActionController::Base
 
   # ログインユーザーか上長か？
   def correct_user_or_superior
-    @user = User.find(params[:user_id]) if @user.blank?
-    unless current_user?(@user) || @user.superior?
+    @user = User.find(params[:id]) if @user.blank?
+    unless current_user?(@user) || current_user.superior?
       flash[:danger] = "参照・編集権限がありません。"
       redirect_to root_url
     end
