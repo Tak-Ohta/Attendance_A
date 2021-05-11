@@ -180,6 +180,7 @@ class AttendancesController < ApplicationController
   def update_overtime_application
     overtime_application_params.each do |id, item|
       attendance = Attendance.find(id)
+      
       if overtime_application_params[id][:scheduled_end_time].blank? || overtime_application_params[id][:work_contents].blank? || overtime_application_params[id][:select_superior_for_overtime].blank?
         flash[:danger] = "終了予定時間、業務内容、または、指示者確認欄がありません。"
       else
@@ -225,8 +226,6 @@ class AttendancesController < ApplicationController
           flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「なし」にしました。" if attendance.confirm_superior_for_overtime == "なし"
           flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「申請中」にしました。" if attendance.confirm_superior_for_overtime == "申請中"
         end
-      else
-        flash[:danger] = "「変更」欄にチェックがありません。#{user.name}の#{l(attendance.worked_on, format: :short)}分の変更を反映できませんでした。"
       end
     end
       redirect_to user_url(current_user)
