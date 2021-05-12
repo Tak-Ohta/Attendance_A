@@ -134,7 +134,7 @@ class AttendancesController < ApplicationController
   # 勤怠変更申請承認
   def edit_attendances_change_approval
     @users = User.includes(:attendances).where(attendances: { select_superior_for_attendance_change: current_user.name })
-                                        .where("instructor_for_attendances_change LIKE ?", "%申請中")
+                                        .where("instructor_for_attendances_change LIKE ?", "%申請中").order("attendances.worked_on")
   end
 
   def update_attendances_change_approval
@@ -199,6 +199,7 @@ class AttendancesController < ApplicationController
   # 残業承認
   def edit_overtime_approval
     @users = User.includes(:attendances).where(attendances: { select_superior_for_overtime: current_user.name })
+              .order("attendances.worked_on")
   end
 
   def update_overtime_approval
