@@ -223,10 +223,7 @@ class AttendancesController < ApplicationController
           attendance.instructor = "残業申請中"
         end
         if attendance.update(item)
-          flash[:success] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「承認」しました。" if attendance.confirm_superior_for_overtime == "承認"
-          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「否認」しました。" if attendance.confirm_superior_for_overtime == "否認"
-          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「なし」にしました。" if attendance.confirm_superior_for_overtime == "なし"
-          flash[:danger] = "#{user.name}の#{l(attendance.worked_on, format: :short)}分の残業申請を「申請中」にしました。" if attendance.confirm_superior_for_overtime == "申請中"
+          flash[:success] = "残業申請の結果を送信しました。"
         end
       end
     end

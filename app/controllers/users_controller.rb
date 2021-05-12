@@ -31,15 +31,11 @@ class UsersController < ApplicationController
       @overtime_application = Attendance.where(select_superior_for_overtime: current_user.name).count
     end
 
-    # 申請中を除くcsv出力用データ
-    csv_attendances = @user.attendances.where(instructor_for_attendances_change: nil)
-                      .or(@user.attendances.where.not("instructor_for_attendances_change LIKE ?", "%申請中"))
-                      .order(:worked_on)
     # csv出力
     respond_to do |format|
       format.html
       format.csv do |csv|
-        send_attendances_csv(csv_attendances)
+        send_attendances_csv(@attendances)
       end
     end
   end
