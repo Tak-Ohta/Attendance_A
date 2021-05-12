@@ -8,7 +8,7 @@
       <table class="table table-bordered" id="attendance-log-search">
         <tr>
           <th>年月</th>
-          <td><%= f.date_select :worked_on, discard_day: "true", use_month_numbers: "true", class: "form-control search-date" %></td>
+          <td><%= f.date_select :worked_on, discard_day: "true", class: "form-control search-date" %></td>
         </tr>
       </table>
       <%= f.submit "検索", class: "btn btn-primary btn-block" %>
