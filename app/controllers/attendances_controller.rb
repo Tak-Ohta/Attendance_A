@@ -67,6 +67,7 @@ class AttendancesController < ApplicationController
   def edit_monthly_attendance_approval
     @users = User.includes(:attendances).where(attendances: {select_superior_for_monthly_attendance: current_user.name}).
                                         where(attendances: {monthly_attendance_approval_result: [nil, '']})
+                                        .order("attendances.worked_on")
   end
 
   def update_monthly_attendance_approval
@@ -89,7 +90,7 @@ class AttendancesController < ApplicationController
           flash[:danger] = "変更を送信できませんでした。"
         end
       else
-        flash[:danger] = "#{user.name}の「変更」欄にチェックがありません。"
+        flash[:danger] = "#{attendance.worked_on.month}月の「変更」欄にチェックがありません。"
       end
     end
     redirect_to user_url(current_user)

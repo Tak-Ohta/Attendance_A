@@ -52,14 +52,14 @@ class UsersController < ApplicationController
         values = [attendance.worked_on,
           attendance.change_before_started_at.present? ? attendance.change_before_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
           attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          if attendance.change_before_started_at.present? && attendance.started_at.present? && attendance.change_before_started_at == attendance.started_at && (attendance.instructor_for_attendances_change != "勤怠変更承認済")
+          if attendance.instructor_for_attendances_change.try(:include?, "申請中")
             nil
           elsif attendance.started_at.present?
             attendance.started_at.floor_to(15.minutes).strftime("%H:%M")
           else
             nil
           end,
-          if attendance.change_before_finished_at.present? && attendance.finished_at.present? && attendance.change_before_finished_at == attendance.finished_at && (attendance.instructor_for_attendances_change != "勤怠変更承認済")
+          if attendance.instructor_for_attendances_change.try(:include?, "申請中")
             nil
           elsif attendance.finished_at.present?
             attendance.finished_at.floor_to(15.minutes).strftime("%H:%M")
