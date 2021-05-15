@@ -240,6 +240,7 @@ class AttendancesController < ApplicationController
 
       @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" })
                                       .where( "cast(worked_on as text) LIKE ?", "#{search_date}%" )
+                                      .order(:worked_on)
     end
   end
 
