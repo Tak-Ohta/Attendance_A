@@ -239,7 +239,7 @@ class AttendancesController < ApplicationController
       search_date = date.strftime('%Y-%m')
 
       @attendances = @user.attendances.where(attendances: { confirm_superior_for_attendance_change: "承認" })
-                                      .where( "worked_on LIKE ?", "#{search_date}%" )
+                                      .where( "cast(worked_on as text) LIKE ?", "#{search_date}%" )
     end
   end
 
