@@ -54,12 +54,16 @@ class UsersController < ApplicationController
           attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
           if attendance.instructor_for_attendances_change.try(:include?, "申請中")
             nil
+          elsif attendance.instructor_for_attendances_change.nil?
+            nil
           elsif attendance.started_at.present?
             attendance.started_at.floor_to(15.minutes).strftime("%H:%M")
           else
             nil
           end,
           if attendance.instructor_for_attendances_change.try(:include?, "申請中")
+            nil
+          elsif attendance.instructor_for_attendances_change.nil?
             nil
           elsif attendance.finished_at.present?
             attendance.finished_at.floor_to(15.minutes).strftime("%H:%M")
