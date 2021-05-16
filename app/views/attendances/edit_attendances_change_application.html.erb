@@ -41,8 +41,10 @@
               </td>
               <!-- 翌日チェック -->
               <td>
-                <% unless day.worked_on > Date.current %>
-                  <%= attendance.check_box :next_day_for_attendance_change, {}, checked_value = "true",unchecked_value = "false" %>
+                <% if day.worked_on > Date.current %>
+                  <%= attendance.check_box :next_day_for_attendance_change, {}, disabled: true %>
+                <% else %>
+                  <%= attendance.check_box :next_day_for_attendance_change, {}, checked_value = "true", unchecked_value = "false" %>
                 <% end %>
               </td>
               <td></td>
@@ -56,7 +58,9 @@
               </td>
               <!-- 指示者確認印 -->
               <td>
-                <% unless day.worked_on > Date.current %>
+                <% if day.worked_on > Date.current %>
+                  <%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {disabled: true, include_blank: true}, {class: "form-control"} %>
+                <% else %>
                   <%= attendance.collection_select :select_superior_for_attendance_change, @superiors, :name, :name, {include_blank: true}, {class: "form-control"} %>
                 <% end %>
               </td>

@@ -146,10 +146,10 @@ class AttendancesController < ApplicationController
         if attendances_change_approval_params[id][:check_box_for_attendance_change] == "true"
           if attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "承認"
             attendance.instructor_for_attendances_change = "勤怠変更承認済"
-            attendances_change_application_params[id][:select_superior_for_attendance_change] = nil
+            attendance.select_superior_for_attendance_change = nil
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "否認"
             attendance.instructor_for_attendances_change = "勤怠変更否認"
-            attendances_change_application_params[id][:select_superior_for_attendance_change] = nil
+            attendance.select_superior_for_attendance_change = nil
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "申請中"
             attendance.instructor_for_attendances_change = "勤怠変更申請中"
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "なし"
@@ -158,7 +158,7 @@ class AttendancesController < ApplicationController
             attendances_change_approval_params[id][:finished_at] = nil
             attendances_change_approval_params[id][:next_day_for_attendance_change] = nil
             attendances_change_approval_params[id][:note] = nil
-            attendances_change_approval_params[:select_superior_for_attendance_change] = nil
+            attendance.select_superior_for_attendance_change = nil
           end
           attendance.attendances_change_approval_day = Date.current
           if attendance.update!(item)
