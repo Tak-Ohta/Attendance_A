@@ -23,8 +23,8 @@ User.create!(name: "上長A",
 User.create!(name: "上長B",
   email: "superior-b@email.com",
   affiliation: "エンジニアリング部",
-  employee_number: 100,
-  uid: "100",
+  employee_number: 3,
+  uid: "3",
   password: "password",
   password_confirmation: "password",
   superior: true,
@@ -32,10 +32,10 @@ User.create!(name: "上長B",
 
 30.times do |n|
   name = Faker::Name.name
-  email = "sample-#{n+3}@email.com"
+  email = "sample-#{n+4}@email.com"
   affiliation = "エンジニアリング部"
-  employee_number = n + 3
-  uid = n + 3
+  employee_number = n + 4
+  uid = n + 4
   password = "password"
   password_confirmation = "password"
   superior = false

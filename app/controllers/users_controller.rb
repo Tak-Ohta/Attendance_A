@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info]
+  before_action :set_user, only: [:show, :edit, :update, :destroy]
   before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy, :edit_overtime_application]
-  before_action :admin_user, only: [:index, :destroy, :at_work, :edit_basic_info]
+  before_action :admin_user, only: [:index, :destroy, :at_work]
   before_action :admin_or_correct_user, only: [:edit, :update]
   before_action :admin_impossible, only: :show
   before_action :correct_user_or_superior, only: :show
@@ -14,7 +14,8 @@ class UsersController < ApplicationController
 
   def show
     # 出勤日数
-    @worked_sum = @attendances.where.not(started_at: nil).count
+    @worked_sum = @attendances.where.not(change_before_started_at: nil)
+                              .or(@attendances.where.not(started_at: nil).where(confirm_superior_for_attendance_change: "承認")).count
     # 所属長承認申請のお知らせ（上長ごとに、1ヶ月分の勤怠申請がされている件数をカウント）
     if current_user.superior?
       @monthly_attendance_application = Attendance.where(select_superior_for_monthly_attendance: current_user.name)
@@ -51,25 +52,13 @@ class UsersController < ApplicationController
         
         values = [attendance.worked_on,
           attendance.change_before_started_at.present? ? attendance.change_before_started_at.floor_to(15.minutes).strftime("%H:%M") : nil,
-          if attendance.next_day_for_attendance_change == "true"
-            attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.tomorrow.floor_to(15.minutes).strftime("%H:%M") : nil
-          else
-            attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil
-          end,
-          if attendance.instructor_for_attendances_change.try(:include?, "申請中")
-            nil
-          elsif attendance.instructor_for_attendances_change.nil?
-            nil
-          elsif attendance.started_at.present?
+          attendance.change_before_finished_at.present? ? attendance.change_before_finished_at.floor_to(15.minutes).strftime("%H:%M") : nil,
+          if attendance.instructor_for_attendances_change.try(:include?, "承認")
             attendance.started_at.floor_to(15.minutes).strftime("%H:%M")
           else
             nil
           end,
-          if attendance.instructor_for_attendances_change.try(:include?, "申請中")
-            nil
-          elsif attendance.instructor_for_attendances_change.nil?
-            nil
-          elsif attendance.finished_at.present?
+          if attendance.instructor_for_attendances_change.try(:include?, "承認")
             attendance.finished_at.floor_to(15.minutes).strftime("%H:%M")
           else
             nil
@@ -114,7 +103,11 @@ class UsersController < ApplicationController
   def update
     if @user.update(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to users_url(current_user)
+      if current_user.admin?
+        redirect_to users_url(current_user)
+      else
+        redirect_to user_url(current_user)  
+      end
     else
       flash[:danger] = "ユーザー情報を更新できませんでした。"
       render :edit
@@ -130,15 +123,10 @@ class UsersController < ApplicationController
   # 出勤社員一覧
   def at_work
     @users = User.all.includes(:attendances).where(attendances: { worked_on: Date.current })
-                                            .where.not(attendances: { started_at: nil })
-                                            .where(attendances: { finished_at: nil })
+                                            .where.not(attendances: { change_before_started_at: nil })
+                                            .where(attendances: { change_before_finished_at: nil })
   end
 
-  def edit_basic_info
-  end
-
-  def update_basic_info
-  end
 
   private
     def user_params

@@ -26,14 +26,14 @@ class AttendancesController < ApplicationController
   def update
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
-    if @attendance.started_at.nil?
-      if @attendance.update(started_at: Time.current.change(sec: 0)) && @attendance.update(change_before_started_at: Time.current.change(sec: 0))
+    if @attendance.change_before_started_at.nil?
+      if @attendance.update(change_before_started_at: Time.current.change(sec: 0))
         flash[:success] = "おはようございます。出勤時間を登録しました。"
       else
         flash[:danger] = UPDATE_ERROR_MSG
       end
-    elsif @attendance.started_at.present? && @attendance.finished_at.nil?
-      if @attendance.update(finished_at: Time.current.change(sec: 0)) && @attendance.update(change_before_finished_at: Time.current.change(sec: 0))
+    elsif @attendance.change_before_started_at.present? && @attendance.change_before_finished_at.nil?
+      if @attendance.update(change_before_finished_at: Time.current.change(sec: 0))
         flash[:success] = "お疲れ様でした。退勤時間を登録しました。"
       else
        flash[:danger] = UPDATE_ERROR_MSG  
@@ -107,22 +107,13 @@ class AttendancesController < ApplicationController
         if attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
         else
           if attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].present?
-            if attendance.change_before_started_at.blank?
-              attendance.change_before_started_at = attendances_change_application_params[id][:started_at]
-            end
-            if attendance.change_before_finished_at.blank?
-              if attendances_change_application_params[id][:next_day_for_attendance_change] == "true"
-                attendance.change_before_finished_at = attendances_change_application_params[id][:finished_at].to_time.tomorrow
-              else
-                attendance.change_before_finished_at = attendances_change_application_params[id][:finished_at]
-              end
-            end
+            attendance.confirm_superior_for_attendance_change = nil
+            attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
+            attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
+            attendance.check_box_for_attendance_change = false
+            attendance.update!(item)
+            flash[:success] = "勤怠の変更申請を送信しました。"
           end
-          attendance.confirm_superior_for_attendance_change = nil
-          attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
-          attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
-          attendance.update!(item)
-          flash[:success] = "勤怠の変更申請を送信しました。"
         end
       end
     end

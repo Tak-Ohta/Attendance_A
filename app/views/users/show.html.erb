@@ -107,37 +107,71 @@
         <td><%= l(day.worked_on, format: :short) %></td>
         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
         <!-- 出社時間 -->
-          <td><%= day.started_at.floor_to(15.minutes).strftime("%H") if day.started_at.present? %></td>
-          <td><%= day.started_at.floor_to(15.minutes).strftime("%M") if day.started_at.present?  %></td>
+        <td>
+          <% if day.started_at.present? %>
+            <%= day.started_at.floor_to(15.minutes).strftime("%H") %>
+          <% elsif day.change_before_started_at.present? %>
+            <%= day.change_before_started_at.floor_to(15.minutes).strftime("%H") %>
+          <% end %>
+        </td>
+        <td>
+          <% if day.started_at.present? %>
+            <%= day.started_at.floor_to(15.minutes).strftime("%M") %>
+          <% elsif day.change_before_started_at.present? %>
+            <%= day.change_before_started_at.floor_to(15.minutes).strftime("%M") %>
+          <% end %>
+        </td>
         <!-- 出勤ボタン -->
         <td>
-          <% if current_user?(@user) || current_user.admin? %>
-            <% if (Date.current == day.worked_on) && day.started_at.nil? %>
+          <% if current_user?(@user) %>
+            <% if (Date.current == day.worked_on) && day.change_before_started_at.nil? %>
               <%= link_to "出勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
             <% end %>
           <% end %>
         </td>
         <!-- 退社時間 -->
-          <td><%= day.finished_at.floor_to(15.minutes).strftime("%H") if day.finished_at.present? %></td>
-          <td><%= day.finished_at.floor_to(15.minutes).strftime("%M") if day.finished_at.present? %></td>
+        <td>
+          <% if day.finished_at.present? %>
+            <%= day.finished_at.floor_to(15.minutes).strftime("%H") %>
+          <% elsif day.change_before_finished_at.present? %>
+            <%= day.change_before_finished_at.floor_to(15.minutes).strftime("%H") %>
+          <% end %>
+        </td>
+        <td>
+          <% if day.finished_at.present? %>
+            <%= day.finished_at.floor_to(15.minutes).strftime("%M") %>
+          <% elsif day.change_before_finished_at.present? %>
+            <%= day.change_before_finished_at.floor_to(15.minutes).strftime("%M") %>
+          <% end %>
+        </td>
         <!-- 退勤ボタン -->
         <td>
-          <% if current_user?(@user) || current_user.admin? %>
-            <% if (Date.current == day.worked_on) && day.started_at.present? && day.finished_at.nil? %>
+          <% if current_user?(@user) %>
+            <% if (Date.current == day.worked_on) && day.change_before_started_at.present? && day.change_before_finished_at.nil? %>
               <%= link_to "退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
             <% end %>
           <% end %>
         </td>
         <!-- 在社時間 -->
         <td>
-          <% if day.started_at.present? && day.finished_at.present? %>
+          <% if day.started_at.present? && day.finished_at.present? && (day.confirm_superior_for_attendance_change == "承認") %>
             <% if day.next_day_for_attendance_change == true %>
               <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
             <% else %>
               <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
             <% end %>
-          <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
+          <% elsif day.started_at.present? && day.finished_at.present? %>
+            <% if day.confirm_superior_for_attendance_change.nil? %>
+              <% if day.next_day_for_attendance_change == true %>
+                <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
+              <% else %>
+                <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+              <% end %>
+            <% end %>
+          <% elsif day.change_before_started_at.present? && day.change_before_finished_at.present? %>
+            <%= str_time = working_time(day.change_before_started_at.floor_to(15.minutes), day.change_before_finished_at.floor_to(15.minutes)) %>
           <% end %>
+          <% @total_working_time = @total_working_time.to_f + str_time.to_f %>
         </td>
         <td><%= day.note %></td>
         <!-- 終了予定時間（時） -->

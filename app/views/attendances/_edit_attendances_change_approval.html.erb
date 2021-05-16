@@ -51,11 +51,11 @@
                         <td><%= l(day.worked_on, format: :short) %></td>
                         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
                         <!-- 変更前：出社：時・分 -->
-                        <td><%= day.change_before_started_at.floor_to(15.minutes).strftime("%H") %></td>
-                        <td><%= day.change_before_started_at.floor_to(15.minutes).strftime("%M") %></td>
+                        <td><%= day.change_before_started_at.floor_to(15.minutes).strftime("%H") unless day.change_before_started_at.nil? %></td>
+                        <td><%= day.change_before_started_at.floor_to(15.minutes).strftime("%M") unless day.change_before_started_at.nil? %></td>
                         <!-- 変更前：退社：時・分 -->
-                        <td><%= day.change_before_finished_at.floor_to(15.minutes).strftime("%H") %></td>
-                        <td><%= day.change_before_finished_at.floor_to(15.minutes).strftime("%M") %></td>
+                        <td><%= day.change_before_finished_at.floor_to(15.minutes).strftime("%H") unless day.change_before_finished_at.nil? %></td>
+                        <td><%= day.change_before_finished_at.floor_to(15.minutes).strftime("%M") unless day.change_before_finished_at.nil? %></td>
                         <!-- 変更後：出社：時・分 -->
                         <td><%= day.started_at.floor_to(15.minutes).strftime("%H") %></td>
                         <td><%= day.started_at.floor_to(15.minutes).strftime("%M") %></td>
