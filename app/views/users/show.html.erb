@@ -124,7 +124,7 @@
         <!-- 出勤ボタン -->
         <td>
           <% if current_user?(@user) %>
-            <% if (Date.current == day.worked_on) && day.change_before_started_at.nil? %>
+            <% if (Date.current == day.worked_on) && day.started_at.nil? %>
               <%= link_to "出勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
             <% end %>
           <% end %>
@@ -147,7 +147,7 @@
         <!-- 退勤ボタン -->
         <td>
           <% if current_user?(@user) %>
-            <% if (Date.current == day.worked_on) && day.change_before_started_at.present? && day.change_before_finished_at.nil? %>
+            <% if (Date.current == day.worked_on) && day.started_at.present? && day.finished_at.nil? %>
               <%= link_to "退勤", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary" %>
             <% end %>
           <% end %>
@@ -212,6 +212,7 @@
         <td colspan="6"></td>
         <td><%= format("%.2f", @total_working_time.to_f) %></td>
         <td colspan="3"></td>
+        <td></td>
         <td></td>
         <!-- 1ヶ月分の勤怠を申請する -->
         <td>

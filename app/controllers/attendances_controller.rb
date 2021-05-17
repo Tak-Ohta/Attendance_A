@@ -9,7 +9,7 @@ class AttendancesController < ApplicationController
   before_action :correct_user, only: [:update, :edit_attendances_change_application, :update_attendances_change_application,
                                   :update_monthly_attendance_application, :edit_overtime_application, :update_overtime_application, :attendance_log]
   before_action :superior_user, only: [:edit_overtime_approval, :update_overtime_approval, :edit_monthly_attendance_approval, :update_monthly_attendance_approval,
-                                      :edit_attendances_change_approval, :update_attendances_change_approval]
+                                      :edit_attendances_change_approval, :update_attendances_change_approval, :attendances_confirmation]
   before_action :set_one_month, only: [:edit_attendances_change_application, :edit_overtime_application, :attendance_log]
   before_action :superiors, only: [:edit_attendances_change_application, :edit_overtime_application]
   before_action :overtime_application, only: [:edit_overtime_application, :update_overtime_application]
@@ -26,14 +26,14 @@ class AttendancesController < ApplicationController
   def update
     @user = User.find(params[:user_id])
     @attendance = Attendance.find(params[:id])
-    if @attendance.change_before_started_at.nil?
-      if @attendance.update(change_before_started_at: Time.current.change(sec: 0))
+    if @attendance.started_at.nil?
+      if @attendance.update(started_at: Time.current.change(sec: 0), change_before_started_at: Time.current.change(sec: 0))
         flash[:success] = "おはようございます。出勤時間を登録しました。"
       else
         flash[:danger] = UPDATE_ERROR_MSG
       end
-    elsif @attendance.change_before_started_at.present? && @attendance.change_before_finished_at.nil?
-      if @attendance.update(change_before_finished_at: Time.current.change(sec: 0))
+    elsif @attendance.started_at.present? && @attendance.finished_at.nil?
+      if @attendance.update(finished_at: Time.current.change(sec: 0), change_before_finished_at: Time.current.change(sec: 0))
         flash[:success] = "お疲れ様でした。退勤時間を登録しました。"
       else
        flash[:danger] = UPDATE_ERROR_MSG  
@@ -113,6 +113,10 @@ class AttendancesController < ApplicationController
             attendance.check_box_for_attendance_change = false
             attendance.update!(item)
             flash[:success] = "勤怠の変更申請を送信しました。"
+          elsif attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].blank?
+            flash[:danger] = "退社時間が入力されていません。"
+          elsif attendances_change_application_params[id][:started_at].blank? && attendances_change_application_params[id][:finished_at].present?
+            flash[:danger] = "出社時間が入力されていません。"
           end
         end
       end
@@ -220,6 +224,10 @@ class AttendancesController < ApplicationController
       end
     end
       redirect_to user_url(current_user)
+  end
+
+  # 上長勤怠確認
+  def attendances_confirmation
   end
 
   # 勤怠ログ

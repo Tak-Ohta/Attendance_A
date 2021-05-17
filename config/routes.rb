@@ -25,6 +25,8 @@ Rails.application.routes.draw do
       patch 'attendances/update_overtime_application'
       get 'attendances/edit_overtime_approval'
       patch 'attendances/update_overtime_approval'
+      # 上長勤怠確認
+      get 'attendances/attendances_confirmation'
       # 勤怠ログ
       get 'attendances/attendance_log'
     end
