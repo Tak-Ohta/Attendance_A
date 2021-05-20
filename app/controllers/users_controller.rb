@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_action :admin_user, only: [:index, :destroy, :at_work]
   before_action :admin_or_correct_user, only: [:edit, :update]
   before_action :admin_impossible, only: :show
-  before_action :correct_user_or_superior, only: :show
+  before_action :correct_user, only: :show
   before_action :set_one_month, only: :show
   before_action :superiors, only: :show
 

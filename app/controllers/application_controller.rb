@@ -46,8 +46,24 @@ class ApplicationController < ActionController::Base
   def correct_user
     @user = User.find(params[:user_id]) if @user.blank?
     unless current_user?(@user)
-      flash[:danger] = "参照・編集権限がありません。"
-      redirect_to root_url
+      if current_user.superior?
+        if params[:date].present?
+          first_day = params[:date].to_date
+          attendances = @user.attendances.where(worked_on: first_day..first_day.end_of_month)
+          if attendances.pluck(:select_superior_for_attendance_change).include?("#{current_user.name}")
+          elsif attendances.pluck(:select_superior_for_overtime).include?("#{current_user.name}")
+          else
+            flash[:danger] = "参照・編集権限がありません。"
+            redirect_to root_url
+          end
+        else
+          flash[:danger] = "参照・編集権限がありません。"
+          redirect_to root_url
+        end
+      else
+        flash[:danger] = "参照・編集権限がありません。"
+        redirect_to root_url
+      end
     end
   end
 
