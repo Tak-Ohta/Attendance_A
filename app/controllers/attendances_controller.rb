@@ -105,13 +105,11 @@ class AttendancesController < ApplicationController
       attendances_change_application_params.each do |id, item|
         attendance = Attendance.find(id)
         if attendances_change_application_params[id][:select_superior_for_attendance_change].present?
-          if attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].present?
-            attendance.confirm_superior_for_attendance_change = nil
-            attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
-            attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
-            attendance.check_box_for_attendance_change = false
-            attendance.update!(item)
-          end
+          attendance.confirm_superior_for_attendance_change = nil
+          attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
+          attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
+          attendance.check_box_for_attendance_change = false
+          attendance.update!(item)
         end
       end
     end
