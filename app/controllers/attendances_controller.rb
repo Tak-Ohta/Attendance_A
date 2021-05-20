@@ -104,23 +104,18 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do
       attendances_change_application_params.each do |id, item|
         attendance = Attendance.find(id)
-        if attendances_change_application_params[id][:select_superior_for_attendance_change].blank?
-        else
+        if attendances_change_application_params[id][:select_superior_for_attendance_change].present?
           if attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].present?
             attendance.confirm_superior_for_attendance_change = nil
             attendance.instructor_for_attendances_change = "#{attendances_change_application_params[id][:select_superior_for_attendance_change]}へ勤怠変更申請中"
             attendance.instructor_of_attendances_log = attendances_change_application_params[id][:select_superior_for_attendance_change]
             attendance.check_box_for_attendance_change = false
             attendance.update!(item)
-            flash[:success] = "勤怠の変更申請を送信しました。"
-          elsif attendances_change_application_params[id][:started_at].present? && attendances_change_application_params[id][:finished_at].blank?
-            flash[:danger] = "退社時間が入力されていません。"
-          elsif attendances_change_application_params[id][:started_at].blank? && attendances_change_application_params[id][:finished_at].present?
-            flash[:danger] = "出社時間が入力されていません。"
           end
         end
       end
     end
+    flash[:success] = "勤怠の変更申請を送信しました。"
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid
     flash[:danger] = "無効な入力データがあったため、更新をキャンセルしました。"
