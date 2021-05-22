@@ -109,9 +109,9 @@
         <!-- 出社時間 -->
         <td>
           <% if day.started_at.present? %>
-            <%= day.started_at.floor_to(15.minutes).strftime("%H") %>
+            <%= day.started_at.strftime("%H") %>
           <% elsif day.change_before_started_at.present? %>
-            <%= day.change_before_started_at.floor_to(15.minutes).strftime("%H") %>
+            <%= day.change_before_started_at.strftime("%H") %>
           <% end %>
         </td>
         <td>
@@ -132,14 +132,22 @@
         <!-- 退社時間 -->
         <td>
           <% if day.finished_at.present? %>
-            <%= day.finished_at.floor_to(15.minutes).strftime("%H") %>
+            <% if day.next_day_for_attendance_change == true %>
+              <%= day.finished_at.tomorrow.strftime("%H") %>
+            <% else %>  
+              <%= day.finished_at.strftime("%H") %>
+            <% end %>
           <% elsif day.change_before_finished_at.present? %>
-            <%= day.change_before_finished_at.floor_to(15.minutes).strftime("%H") %>
+            <%= day.change_before_finished_at.strftime("%H") %>
           <% end %>
         </td>
         <td>
           <% if day.finished_at.present? %>
-            <%= day.finished_at.floor_to(15.minutes).strftime("%M") %>
+            <% if day.next_day_for_attendance_change == true %>
+              <%= day.finished_at.tomorrow.floor_to(15.minutes).strftime("%M") %>
+            <% else %>  
+              <%= day.finished_at.floor_to(15.minutes).strftime("%M") %>
+            <% end %>
           <% elsif day.change_before_finished_at.present? %>
             <%= day.change_before_finished_at.floor_to(15.minutes).strftime("%M") %>
           <% end %>
@@ -154,19 +162,11 @@
         </td>
         <!-- 在社時間 -->
         <td>
-          <% if day.started_at.present? && day.finished_at.present? && (day.confirm_superior_for_attendance_change == "承認") %>
+          <% if day.started_at.present? && day.finished_at.present? %>
             <% if day.next_day_for_attendance_change == true %>
               <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
             <% else %>
               <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-            <% end %>
-          <% elsif day.started_at.present? && day.finished_at.present? %>
-            <% if day.confirm_superior_for_attendance_change.nil? %>
-              <% if day.next_day_for_attendance_change == true %>
-                <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.tomorrow.floor_to(15.minutes)) %>
-              <% else %>
-                <%= str_time = working_time(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
-              <% end %>
             <% end %>
           <% elsif day.change_before_started_at.present? && day.change_before_finished_at.present? %>
             <%= str_time = working_time(day.change_before_started_at.floor_to(15.minutes), day.change_before_finished_at.floor_to(15.minutes)) %>

@@ -8,8 +8,9 @@ Rails.application.routes.draw do
   delete '/logout', to: 'sessions#destroy'
 
   resources :users do
+    
     member do
-      
+      get 'edit_basic_info'
       # 1ヶ月の勤怠申請・承認
       get 'attendances/edit_monthly_attendance_application'
       patch 'attendances/update_monthly_attendance_application'

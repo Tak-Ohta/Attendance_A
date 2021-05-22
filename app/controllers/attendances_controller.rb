@@ -51,6 +51,8 @@ class AttendancesController < ApplicationController
       attendance = Attendance.find(id)
       attendance.monthly_attendance_approval_result = nil
       if monthly_attendance_application_params[id][:select_superior_for_monthly_attendance].present?
+        attendance.confirm_superior_for_monthly_attendance = nil
+        attendance.monthly_attendance_check_box = nil
         if attendance.update(item)
           flash[:success] = "#{attendance.select_superior_for_monthly_attendance}へ1ヶ月分の勤怠を申請しました。"
         else
@@ -65,8 +67,8 @@ class AttendancesController < ApplicationController
 
   # 1ヶ月の勤怠承認
   def edit_monthly_attendance_approval
-    @users = User.includes(:attendances).where(attendances: {select_superior_for_monthly_attendance: current_user.name}).
-                                        where(attendances: {monthly_attendance_approval_result: [nil, '']})
+    @users = User.includes(:attendances).where(attendances: {select_superior_for_monthly_attendance: current_user.name})
+                                        .where(attendances: {monthly_attendance_approval_result: [nil, '']})
                                         .order("attendances.worked_on")
   end
 
@@ -76,21 +78,20 @@ class AttendancesController < ApplicationController
       user = User.find(attendance.user_id)
       if monthly_attendance_approval_params[id][:monthly_attendance_check_box] == "true"
         if monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "承認"
-          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から承認済"
+          attendance.monthly_attendance_approval_result = "#{current_user.name}から承認済"
         elsif monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "否認"
-          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から否認"
+          attendance.monthly_attendance_approval_result = "#{current_user.name}から否認"
         elsif monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "なし"
-          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}からなし"
+          attendance.monthly_attendance_approval_result = "#{current_user.name}からなし"
         else monthly_attendance_approval_params[id][:confirm_superior_for_monthly_attendance] == "申請中"
-          attendance.monthly_attendance_approval_result = "#{attendance.select_superior_for_monthly_attendance}から保留"
+          attendance.monthly_attendance_approval_result = "#{current_user.name}から保留"
         end
+        attendance.select_superior_for_monthly_attendance = nil
         if attendance.update(item)
           flash[:success] = "変更を送信しました。"
         else
           flash[:danger] = "変更を送信できませんでした。"
         end
-      else
-        flash[:danger] = "#{attendance.worked_on.month}月の「変更」欄にチェックがありません。"
       end
     end
     redirect_to user_url(current_user)
@@ -137,6 +138,9 @@ class AttendancesController < ApplicationController
             attendance.select_superior_for_attendance_change = nil
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "否認"
             attendance.instructor_for_attendances_change = "勤怠変更否認"
+            attendances_change_approval_params[id][:started_at] = nil
+            attendances_change_approval_params[id][:finished_at] = nil
+            attendances_change_approval_params[id][:next_day_for_attendance_change] = nil
             attendance.select_superior_for_attendance_change = nil
           elsif attendances_change_approval_params[id][:confirm_superior_for_attendance_change] == "申請中"
             attendance.instructor_for_attendances_change = "勤怠変更申請中"
@@ -145,7 +149,6 @@ class AttendancesController < ApplicationController
             attendances_change_approval_params[id][:started_at] = nil
             attendances_change_approval_params[id][:finished_at] = nil
             attendances_change_approval_params[id][:next_day_for_attendance_change] = nil
-            attendances_change_approval_params[id][:note] = nil
             attendance.select_superior_for_attendance_change = nil
           end
           attendance.attendances_change_approval_day = Date.current

@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
   # 管理者は勤怠画面の表示と編集は不可
   def admin_impossible
     if current_user.admin?
-      flash[:danger] = "参照・編集権限がありません。"
+      flash[:danger] = "管理者は勤怠画面の表示および編集はできません。"
       redirect_to users_url
     end
   end
@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
           attendances = @user.attendances.where(worked_on: first_day..first_day.end_of_month)
           if attendances.pluck(:select_superior_for_attendance_change).include?("#{current_user.name}")
           elsif attendances.pluck(:select_superior_for_overtime).include?("#{current_user.name}")
+          elsif attendances.pluck(:select_superior_for_monthly_attendance).include?("#{current_user.name}")
           else
             flash[:danger] = "参照・編集権限がありません。"
             redirect_to root_url
